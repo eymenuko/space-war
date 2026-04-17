@@ -1301,3 +1301,45 @@ body {
     box-shadow: 0 0 20px rgba(0, 245, 255, 0.8);
     transform: rotate(90deg);
 }
+
+/* RTL Support for Arabic */
+[dir="rtl"] {
+    direction: rtl;
+    text-align: right;
+}
+
+[dir="rtl"] .hud-left {
+    left: auto;
+    right: 20px;
+}
+
+[dir="rtl"] .hud-right {
+    right: auto;
+    left: 20px;
+}
+
+[dir="rtl"] .hangar-header {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .ship-card-header {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .stat-item {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .merchant-header {
+    text-align: right;
+}
+
+[dir="rtl"] .merchant-wallet {
+    margin-right: auto;
+    margin-left: 0;
+}
+
+[dir="rtl"] .settings-open-btn {
+    right: auto;
+    left: 20px;
+}
