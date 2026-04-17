@@ -47,6 +47,12 @@
                 <button id="hangar-btn" class="neon-btn hangar">
                     <span data-i18n="hangar">🚀 GEMİLER</span>
                 </button>
+                <button id="lab-btn" class="neon-btn lab">
+                    <span data-i18n="lab">🧬 LABORATUVAR</span>
+                </button>
+                <button id="achievements-btn" class="neon-btn achievements">
+                    <span data-i18n="achievements">🏆 BAŞARILAR</span>
+                </button>
             </div>
         </div>
     </div>
@@ -64,6 +70,47 @@
             </div>
             <div class="hangar-footer">
                 <button id="hangar-back-btn" class="neon-btn">
+                    <span data-i18n="back">◀ GERİ</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lab Screen (Upgrades) -->
+    <div id="lab-screen" class="screen">
+        <div class="stars-bg"></div>
+        <div class="lab-content">
+            <div class="lab-header">
+                <h1 class="lab-title" data-i18n="lab_title">🧬 GEMİ LABORATUVARI</h1>
+                <div class="lab-coins">🪙 <span id="lab-coins">0</span> <span data-i18n="gold">Altın</span></div>
+            </div>
+            <div id="upgrade-grid" class="upgrade-grid">
+                <!-- Upgrades will be injected here -->
+            </div>
+            <div class="lab-footer">
+                <button id="lab-back-btn" class="neon-btn">
+                    <span data-i18n="back">◀ GERİ</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Achievements Screen -->
+    <div id="achievements-screen" class="screen">
+        <div class="stars-bg"></div>
+        <div class="achievements-content">
+            <div class="achievements-header">
+                <h1 class="achievements-title" data-i18n="achievements_title">🏆 PİLOT BAŞARILARI</h1>
+                <div class="achievements-stats">
+                    <div class="stat-mini"><span data-i18n="total_kills">Toplam Av</span>: <span id="stat-kills">0</span></div>
+                    <div class="stat-mini"><span data-i18n="total_bosses">Devrilen Devler</span>: <span id="stat-bosses">0</span></div>
+                </div>
+            </div>
+            <div id="achievements-list" class="achievements-list">
+                <!-- Achievements will be injected here -->
+            </div>
+            <div class="achievements-footer">
+                <button id="achievements-back-btn" class="neon-btn">
                     <span data-i18n="back">◀ GERİ</span>
                 </button>
             </div>
@@ -137,6 +184,15 @@
                         <span data-i18n="continue">DEVAM ET ▶</span>
                     </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Boss Dialogue Overlay -->
+        <div id="dialogue-container" class="dialogue-container hidden">
+            <div class="dialogue-portrait" id="dialogue-emoji">👾</div>
+            <div class="dialogue-content">
+                <div class="dialogue-name" id="dialogue-name">Zorgax</div>
+                <div class="dialogue-text" id="dialogue-text">...</div>
             </div>
         </div>
 

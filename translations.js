@@ -108,7 +108,44 @@ const translations = {
         buy: "AL",
         sell: "SAT",
         msg_touch_on: "📱 Dokunmatik Kontroller Aktif",
-        msg_touch_off: "⌨️ Klavye Kontrolleri Aktif"
+        msg_touch_off: "⌨️ Klavye Kontrolleri Aktif",
+
+        // Lab & Achievements
+        lab: "🧬 LABORATUVAR",
+        lab_title: "🧬 GEMİ LABORATUVARI",
+        upgrade: "GELİŞTİR",
+        max: "MAX",
+        level: "Seviye",
+        achievements: "🏆 BAŞARILAR",
+        achievements_title: "🏆 PİLOT BAŞARILARI",
+        total_kills: "Toplam Av",
+        total_bosses: "Devrilen Devler",
+        total_gold: "Servet",
+        max_wave: "En Uzun Sefer",
+
+        // Powerups
+        msg_double_shot: "⚡ ÇİFT ATEŞ!",
+        msg_time_slow: "🌀 ZAMAN YAVAŞLADI!",
+        msg_magnet: "🧲 MIKNATIS!",
+        msg_nuke: "☢️ NÜKLEER PATLAMA!",
+
+        // Boss Dialogues
+        zorgax_msg: "Solucan deliğinden çıktım ve burası artık benim!",
+        krypton_msg: "Gezegenini sildim, sıra sende küçük pilot.",
+        nebula_msg: "Kozmik tozun içinde kaybolmaya hazır mısın?",
+        infernox_msg: "Cehennem ateşi boşluğu yakmaya geliyor!",
+        glacius_msg: "Mutlak sıfır noktasına hoş geldin.",
+        voidclaw_msg: "Karanlık seni yutacak, kaçış yok.",
+
+        // Achievements
+        ach_first_kill: "Çaylak Pilot",
+        ach_kills_desc: "100 düşman yok et.",
+        ach_boss_slayer: "Boss Avcısı",
+        ach_boss_desc: "10 Boss devir.",
+        ach_rich: "Zengin",
+        ach_gold_desc: "5000 altın biriktir.",
+        ach_survivor: "Kıdemli",
+        ach_wave_desc: "10. dalgaya ulaş."
     },
     en: {
         title: "SPACE WAR",
@@ -214,7 +251,44 @@ const translations = {
         buy: "BUY",
         sell: "SELL",
         msg_touch_on: "📱 Touch Controls Active",
-        msg_touch_off: "⌨️ Keyboard Controls Active"
+        msg_touch_off: "⌨️ Keyboard Controls Active",
+
+        // Lab & Achievements
+        lab: "🧬 LAB",
+        lab_title: "🧬 SHIP LABORATORY",
+        upgrade: "UPGRADE",
+        max: "MAX",
+        level: "Level",
+        achievements: "🏆 ACHIEVEMENTS",
+        achievements_title: "🏆 PILOT ACHIEVEMENTS",
+        total_kills: "Total Kills",
+        total_bosses: "Bosses Slain",
+        total_gold: "Wealth",
+        max_wave: "Longest Run",
+
+        // Powerups
+        msg_double_shot: "⚡ DOUBLE SHOT!",
+        msg_time_slow: "🌀 TIME SLOWED!",
+        msg_magnet: "🧲 MAGNET!",
+        msg_nuke: "☢️ NUCLEAR BLAST!",
+
+        // Boss Dialogues
+        zorgax_msg: "I emerged from the wormhole, and this place is now mine!",
+        krypton_msg: "I erased your planet, now it's your turn, little pilot.",
+        nebula_msg: "Are you ready to get lost in the cosmic dust?",
+        infernox_msg: "Hellfire is coming to burn the void!",
+        glacius_msg: "Welcome to absolute zero.",
+        voidclaw_msg: "Darkness will swallow you, there is no escape.",
+
+        // Achievements
+        ach_first_kill: "Rookie Pilot",
+        ach_kills_desc: "Destroy 100 enemies.",
+        ach_boss_slayer: "Boss Slayer",
+        ach_boss_desc: "Defeat 10 Bosses.",
+        ach_rich: "Rich",
+        ach_gold_desc: "Earn 5000 gold.",
+        ach_survivor: "Veteran",
+        ach_wave_desc: "Reach wave 10."
     },
     ru: {
         title: "КОСМИЧЕСКАЯ ВОЙНА",
@@ -320,7 +394,44 @@ const translations = {
         buy: "КУПИТЬ",
         sell: "ПРОДАТЬ",
         msg_touch_on: "📱 Сенсорное упр. активно",
-        msg_touch_off: "⌨️ Упр. с клавиатуры активно"
+        msg_touch_off: "⌨️ Упр. с клавиатуры активно",
+
+        // Lab & Achievements
+        lab: "🧬 ЛАБОРАТОРИЯ",
+        lab_title: "🧬 СУДОВАЯ ЛАБОРАТОРИЯ",
+        upgrade: "УЛУЧШИТЬ",
+        max: "МАКС",
+        level: "Уровень",
+        achievements: "🏆 ДОСТИЖЕНИЯ",
+        achievements_title: "🏆 ДОСТИЖЕНИЯ ПИЛОТА",
+        total_kills: "Всего убийств",
+        total_bosses: "Боссов убито",
+        total_gold: "Богатство",
+        max_wave: "Лучший забег",
+
+        // Powerups
+        msg_double_shot: "⚡ ДВОЙНОЙ ВЫСТРЕЛ!",
+        msg_time_slow: "🌀 ВРЕМЯ ЗАМЕДЛИЛОСЬ!",
+        msg_magnet: "🧲 МАГНИТ!",
+        msg_nuke: "☢️ ЯДЕРНЫЙ ВЗРЫВ!",
+
+        // Boss Dialogues
+        zorgax_msg: "Я вышел из червоточины, и теперь это место мое!",
+        krypton_msg: "Я стер твою планету, теперь твоя очередь, маленький пилот.",
+        nebula_msg: "Готов потеряться в космической пыли?",
+        infernox_msg: "Адский огонь идет сжигать пустоту!",
+        glacius_msg: "Добро пожаловать в абсолютный ноль.",
+        voidclaw_msg: "Тьма поглотит тебя, спасения нет.",
+
+        // Achievements
+        ach_first_kill: "Пилот-новичок",
+        ach_kills_desc: "Уничтожить 100 врагов.",
+        ach_boss_slayer: "Охотник на боссов",
+        ach_boss_desc: "Победить 10 боссов.",
+        ach_rich: "Богач",
+        ach_gold_desc: "Заработать 5000 золота.",
+        ach_survivor: "Ветеран",
+        ach_wave_desc: "Дойти до 10-й волны."
     },
     ar: {
         title: "حرب الفضاء",
@@ -426,7 +537,44 @@ const translations = {
         buy: "شراء",
         sell: "بيع",
         msg_touch_on: "📱 تحكم اللمس نشط",
-        msg_touch_off: "⌨️ تحكم لوحة المفاتيح نشط"
+        msg_touch_off: "⌨️ تحكم لوحة المفاتيح نشط",
+
+        // Lab & Achievements
+        lab: "🧬 المختبر",
+        lab_title: "🧬 مختبر السفينة",
+        upgrade: "تطوير",
+        max: "أقصى",
+        level: "مستوى",
+        achievements: "🏆 الإنجازات",
+        achievements_title: "🏆 إنجازات الطيار",
+        total_kills: "إجمالي القتلى",
+        total_bosses: "الزعماء المقتولين",
+        total_gold: "الثروة",
+        max_wave: "أطول رحلة",
+
+        // Powerups
+        msg_double_shot: "⚡ طلقة مزدوجة!",
+        msg_time_slow: "🌀 تباطؤ الوقت!",
+        msg_magnet: "🧲 مغناطيس!",
+        msg_nuke: "☢️ انفجار نووي!",
+
+        // Boss Dialogues
+        zorgax_msg: "لقد خرجت من الثقب الدودي، وهذا المكان أصبح لي الآن!",
+        krypton_msg: "لقد مسحت كوكبك، والآن حان دورك أيها الطيار الصغير.",
+        nebula_msg: "هل أنت مستعد للضياع في الغبار الكوني؟",
+        infernox_msg: "نار الجحيم قادمة لحرق الفراغ!",
+        glacius_msg: "مرحباً بك في الصفر المطلق.",
+        voidclaw_msg: "الظلام سوف يبتلعك، لا مفر.",
+
+        // Achievements
+        ach_first_kill: "طيار مبتدئ",
+        ach_kills_desc: "دمر 100 عدو.",
+        ach_boss_slayer: "صائد الزعماء",
+        ach_boss_desc: "اهزم 10 زعماء.",
+        ach_rich: "غني",
+        ach_gold_desc: "اجمع 5000 ذهب.",
+        ach_survivor: "مخضرم",
+        ach_wave_desc: "صل إلى الموجة 10."
     },
     el: {
         title: "ΔΙΑΣΤΗΜΙΚΟΣ ΠΟΛΕΜΟΣ",
@@ -532,6 +680,43 @@ const translations = {
         buy: "ΑΓΟΡΑ",
         sell: "ΠΩΛΗΣΗ",
         msg_touch_on: "📱 Έλεγχος αφής ενεργός",
-        msg_touch_off: "⌨️ Έλεγχος πληκτρολογίου ενεργός"
+        msg_touch_off: "⌨️ Έλεγχος πληκτρολογίου ενεργός",
+
+        // Lab & Achievements
+        lab: "🧬 ΕΡΓΑΣΤΗΡΙΟ",
+        lab_title: "🧬 ΕΡΓΑΣΤΗΡΙΟ ΣΚΑΦΟΥΣ",
+        upgrade: "ΑΝΑΒΑΘΜΙΣΗ",
+        max: "MAX",
+        level: "Επίπεδο",
+        achievements: "🏆 ΕΠΙΤΕΥΓΜΑΤΑ",
+        achievements_title: "🏆 ΕΠΙΤΕΥΓΜΑΤΑ ΠΙΛΟΤΟΥ",
+        total_kills: "Συνολικές Καταρρίψεις",
+        total_bosses: "Αρχηγοί ηττήθηκαν",
+        total_gold: "Πλούτος",
+        max_wave: "Καλύτερη Πορεία",
+
+        // Powerups
+        msg_double_shot: "⚡ ΔΙΠΛΗ ΒΟΛΗ!",
+        msg_time_slow: "🌀 Ο ΧΡΟΝΟΣ ΕΠΙΒΡΑΔΥΝΘΗΚΕ!",
+        msg_magnet: "🧲 ΜΑΓΝΗΤΗΣ!",
+        msg_nuke: "☢️ ΠΥΡΗΝΙΚΗ ΕΚΡΗΞΗ!",
+
+        // Boss Dialogues
+        zorgax_msg: "Βγήκα από τη σκουληκότρυπα και αυτό το μέρος μου ανήκει!",
+        krypton_msg: "Έσβησα τον πλανήτη σου, τώρα είναι η σειρά σου, μικρέ πιλότε.",
+        nebula_msg: "Είσαι έτοιμος να χαθείς στην κοσμική σκόνη;",
+        infernox_msg: "Η φωτιά της κόλασης έρχεται να κάψει το κενό!",
+        glacius_msg: "Καλώς ήρθατε στο απόλυτο μηδέν.",
+        voidclaw_msg: "Το σκοτάδι θα σε καταπιεί, δεν υπάρχει διαφυγή.",
+
+        // Achievements
+        ach_first_kill: "Νέος Πιλότος",
+        ach_kills_desc: "Καταστρέψτε 100 εχθρούς.",
+        ach_boss_slayer: "Κυνηγός Αρχηγών",
+        ach_boss_desc: "Νικήστε 10 Αρχηγούς.",
+        ach_rich: "Πλούσιος",
+        ach_gold_desc: "Κερδίστε 5000 χρυσό.",
+        ach_survivor: "Βετεράνος",
+        ach_wave_desc: "Φτάστε στο κύμα 10."
     }
 };

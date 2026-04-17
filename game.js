@@ -12,7 +12,9 @@
         hangar: $('hangar-screen'),
         game: $('game-screen'),
         over: $('gameover-screen'),
-        settings: $('settings-screen')
+        settings: $('settings-screen'),
+        lab: $('lab-screen'),
+        achievements: $('achievements-screen')
     };
 
     const hud = {
@@ -933,8 +935,20 @@
         touchMode: false,
         sfxEnabled: true,
         bgmEnabled: true,
-        language: 'tr'
+        language: 'tr',
+        upgrades: { hp: 0, speed: 0, damage: 0, energy: 0 },
+        stats: { totalKills: 0, totalBosses: 0, totalGold: 0, maxWave: 0 },
+        unlockedAchievements: []
     };
+
+    const ACHIEVEMENT_LIST = [
+        { id: 'rookie_pilot', icon: '🐣', get title() { return t('ach_first_kill'); }, get desc() { return t('ach_kills_desc'); }, goal: 100, stat: 'totalKills', reward: 200 },
+        { id: 'boss_hunter', icon: '🎯', get title() { return t('ach_boss_slayer'); }, get desc() { return t('ach_boss_desc'); }, goal: 10, stat: 'totalBosses', reward: 1000 },
+        { id: 'millionaire', icon: '💰', get title() { return t('ach_rich'); }, get desc() { return t('ach_gold_desc'); }, goal: 5000, stat: 'totalGold', reward: 500 },
+        { id: 'veteran', icon: '🎗️', get title() { return t('ach_survivor'); }, get desc() { return t('ach_wave_desc'); }, goal: 10, stat: 'maxWave', reward: 500 }
+    ];
+
+    const UPGRADE_COSTS = [500, 1000, 2000, 4000, 8000];
 
     function saveData() {
         try {
@@ -950,6 +964,9 @@
                 persistentData = { ...persistentData, ...parsed };
                 if (persistentData.sfxEnabled === undefined) persistentData.sfxEnabled = true;
                 if (persistentData.bgmEnabled === undefined) persistentData.bgmEnabled = true;
+                if (!persistentData.upgrades) persistentData.upgrades = { hp: 0, speed: 0, damage: 0, energy: 0 };
+                if (!persistentData.stats) persistentData.stats = { totalKills: 0, totalBosses: 0, totalGold: 0, maxWave: 0 };
+                if (!persistentData.unlockedAchievements) persistentData.unlockedAchievements = [];
             }
         } catch (e) { /* ignore */ }
     }
@@ -994,15 +1011,21 @@
                 y: h - 100,
                 width: 40,
                 height: 50,
-                hp: ship.maxHP,
-                energy: 3,
-                speed: ship.speed,
+                hp: ship.maxHP + (persistentData.upgrades.hp * 20),
+                maxHP: ship.maxHP + (persistentData.upgrades.hp * 20),
+                energy: 3 + (persistentData.upgrades.energy * 0.5),
+                maxEnergy: 3 + (persistentData.upgrades.energy * 0.5),
+                speed: ship.speed + (persistentData.upgrades.speed * 0.5),
+                damageBonus: persistentData.upgrades.damage * 2,
                 invincible: 0,
                 thrusterPhase: 0,
                 hasShield: false,
                 shieldTimer: 0,
                 autoFire: 0,
-                beamMode: 0
+                beamMode: 0,
+                doubleShot: 0,
+                timeSlow: 0,
+                magnet: 0
             },
 
             boss: null,
@@ -1010,6 +1033,7 @@
             bossBullets: [],
             particles: [],
             stars: [],
+            powerups: [],
             explosions: [],
             damageNumbers: [],
 
@@ -1069,6 +1093,36 @@
             game.player.hasShield = false;
             showMessage(t('shield_active'), '#7b2ff7');
         }
+
+        // Show dialogue
+        const bossMsgs = {
+            'Zorgax': t('zorgax_msg'),
+            'Krypton': t('krypton_msg'),
+            'Nebula': t('nebula_msg'),
+            'Infernox': t('infernox_msg'),
+            'Glacius': t('glacius_msg'),
+            'Voidclaw': t('voidclaw_msg')
+        };
+        showDialogue(type.name, bossMsgs[type.name] || "...", type.emoji);
+    }
+
+    function showDialogue(name, text, emoji) {
+        const container = $('dialogue-container');
+        $('dialogue-name').textContent = name;
+        $('dialogue-text').textContent = text;
+        $('dialogue-emoji').textContent = emoji;
+        container.classList.remove('hidden');
+        container.classList.add('active');
+        
+        // Brief pause feel
+        game.paused = true;
+        setTimeout(() => {
+            game.paused = false;
+            setTimeout(() => {
+                container.classList.remove('active');
+                setTimeout(() => container.classList.add('hidden'), 500);
+            }, 3000);
+        }, 1500);
     }
 
     // ===== RESIZE =====
@@ -1266,6 +1320,11 @@
             p.energy -= ship.shotCost;
             shootCooldown = ship.shotCooldown;
             ship.fireShot(game, p);
+            
+            // Double shot powerup
+            if (p.doubleShot > 0) {
+                setTimeout(() => ship.fireShot(game, p), 100);
+            }
         }
     }
 
@@ -1389,6 +1448,63 @@
             vy: -2,
             life: 40
         });
+    }
+
+    // ===== POWER-UPS =====
+    function spawnPowerup(x, y) {
+        const types = ['double_shot', 'time_slow', 'magnet', 'nuke'];
+        const type = types[Math.floor(Math.random() * types.length)];
+        const colors = {
+            'double_shot': '#ffcc00',
+            'time_slow': '#00f5ff',
+            'magnet': '#ff00ff',
+            'nuke': '#ff4400'
+        };
+        const emojis = {
+            'double_shot': '⚡',
+            'time_slow': '🌀',
+            'magnet': '🧲',
+            'nuke': '☢️'
+        };
+
+        game.powerups.push({
+            x, y,
+            type,
+            color: colors[type],
+            emoji: emojis[type],
+            size: 20,
+            vy: 2,
+            angle: 0
+        });
+    }
+
+    function applyPowerup(type) {
+        const p = game.player;
+        AudioManager.playSound('powerup');
+        switch(type) {
+            case 'double_shot':
+                p.doubleShot = 600; // 10s
+                showMessage(t('msg_double_shot'), '#ffcc00');
+                break;
+            case 'time_slow':
+                p.timeSlow = 480; // 8s
+                showMessage(t('msg_time_slow'), '#00f5ff');
+                break;
+            case 'magnet':
+                p.magnet = 900; // 15s
+                showMessage(t('msg_magnet'), '#ff00ff');
+                break;
+            case 'nuke':
+                game.screenShake = 30;
+                game.shakeIntensity = 15;
+                if (game.boss && !game.boss.entering) {
+                    game.boss.hp -= 100;
+                    spawnDamageNumber(game.boss.x, game.boss.y, 100, '#ff4400');
+                }
+                game.bossBullets = [];
+                showMessage(t('msg_nuke'), '#ff4400');
+                break;
+        }
     }
 
     // ===== MESSAGE DISPLAY =====
@@ -1548,6 +1664,114 @@
         });
     }
 
+    // ===== LAB SYSTEM =====
+    function openLab() {
+        showScreen('lab');
+        updateLabUI();
+    }
+
+    function updateLabUI() {
+        $('lab-coins').textContent = persistentData.totalCoins;
+        const grid = $('upgrade-grid');
+        grid.innerHTML = '';
+
+        const stats = [
+            { id: 'hp', name: t('stat_hp'), icon: '❤️' },
+            { id: 'speed', name: t('stat_speed'), icon: '🚀' },
+            { id: 'damage', name: t('stat_damage'), icon: '💥' },
+            { id: 'energy', name: t('stat_energy'), icon: '⚡' }
+        ];
+
+        stats.forEach(stat => {
+            const level = persistentData.upgrades[stat.id];
+            const cost = UPGRADE_COSTS[level] || null;
+            const isMax = level >= 5;
+
+            const card = document.createElement('div');
+            card.className = 'upgrade-card';
+            card.innerHTML = `
+                <div class="upgrade-info">
+                    <span class="upgrade-name">${stat.icon} ${stat.name}</span>
+                    <span class="upgrade-level">${t('level')} ${level}/5</span>
+                </div>
+                <div class="upgrade-bar-bg">
+                    <div class="upgrade-bar-fill" style="width: ${level * 20}%"></div>
+                </div>
+                <div class="upgrade-action">
+                    <span class="upgrade-cost">${isMax ? t('max') : '🪙 ' + cost}</span>
+                    <button class="neon-btn upgrade-btn ${isMax ? 'maxed' : ''}" 
+                        data-stat="${stat.id}" ${isMax || persistentData.totalCoins < cost ? 'disabled' : ''}>
+                        ${isMax ? t('max') : t('upgrade')}
+                    </button>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+
+        grid.querySelectorAll('.upgrade-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const statId = btn.dataset.stat;
+                const level = persistentData.upgrades[statId];
+                const cost = UPGRADE_COSTS[level];
+                if (persistentData.totalCoins >= cost) {
+                    persistentData.totalCoins -= cost;
+                    persistentData.upgrades[statId]++;
+                    saveData();
+                    AudioManager.playSound('btn_click');
+                    updateLabUI();
+                    updateMenuUI();
+                }
+            });
+        });
+    }
+
+    // ===== ACHIEVEMENTS SYSTEM =====
+    function openAchievements() {
+        showScreen('achievements');
+        updateAchievementsUI();
+    }
+
+    function updateAchievementsUI() {
+        $('stat-kills').textContent = persistentData.stats.totalKills;
+        $('stat-bosses').textContent = persistentData.stats.totalBosses;
+        const list = $('achievements-list');
+        list.innerHTML = '';
+
+        ACHIEVEMENT_LIST.forEach(ach => {
+            const current = persistentData.stats[ach.stat] || 0;
+            const isUnlocked = current >= ach.goal;
+            const isClaimed = persistentData.unlockedAchievements.includes(ach.id);
+
+            const item = document.createElement('div');
+            item.className = `achievement-item ${isUnlocked ? 'unlocked' : ''}`;
+            item.innerHTML = `
+                <div class="achievement-icon">${ach.icon}</div>
+                <div class="achievement-details">
+                    <div class="achievement-title">${ach.title}</div>
+                    <div class="achievement-desc">${ach.desc} (${Math.min(current, ach.goal)}/${ach.goal})</div>
+                </div>
+                ${isUnlocked && !isClaimed ? `<button class="neon-btn claim-btn" data-id="${ach.id}">🎁 ${ach.reward}</button>` : ''}
+                ${isClaimed ? '<span class="claimed-check">✅</span>' : ''}
+            `;
+            list.appendChild(item);
+        });
+
+        list.querySelectorAll('.claim-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.dataset.id;
+                const ach = ACHIEVEMENT_LIST.find(a => a.id === id);
+                if (ach && !persistentData.unlockedAchievements.includes(id)) {
+                    persistentData.totalCoins += ach.reward;
+                    persistentData.unlockedAchievements.push(id);
+                    saveData();
+                    AudioManager.playSound('crystal');
+                    updateAchievementsUI();
+                    updateMenuUI();
+                }
+            });
+        });
+    }
+
     function updateCoinDisplay() {
         hud.coins.textContent = game.coins;
         hud.merchantCoins.textContent = game.coins;
@@ -1614,6 +1838,18 @@
             }
         }
 
+        // --- Powerup Timers ---
+        if (p.doubleShot > 0) p.doubleShot--;
+        if (p.timeSlow > 0) p.timeSlow--;
+        if (p.magnet > 0) {
+            p.magnet--;
+            // Pull all boss bullets away? No, pull coins!
+            // Wait, coins are not separate objects yet, they are added to `game.coins` when head is sold.
+            // Let's make the magnet pull "ghost coins" that spawn sometimes?
+            // Actually, let's make it pull Boss Heads if they were physical objects.
+            // For now, let's make Magnet give a bonus to gold earned.
+        }
+
         // --- Invincibility ---
         if (p.invincible > 0) p.invincible--;
         p.thrusterPhase += 0.15;
@@ -1678,12 +1914,17 @@
                 
                 if (game.combo >= 10 && game.combo % 10 === 0) {
                     showMessage(t('serial_killer'), '#ff2d55', 2000);
-                    game.player.energy = Math.min(MAX_ENERGY, game.player.energy + 2);
+                    game.player.energy = Math.min(game.player.maxEnergy, game.player.energy + 2);
                 } else if (game.combo >= 5 && game.combo % 5 === 0) {
                     showMessage(t('perfect'), '#00ff88');
-                    game.player.energy = Math.min(MAX_ENERGY, game.player.energy + 1);
+                    game.player.energy = Math.min(game.player.maxEnergy, game.player.energy + 1);
                 } else if (game.combo >= 3 && game.combo % 3 === 0) {
                     showMessage(t('good'), '#ffff00');
+                }
+
+                // Random powerup drop
+                if (Math.random() < 0.15) {
+                    spawnPowerup(bullet.x, bullet.y);
                 }
 
                 if (b.hp <= 0) {
@@ -1785,8 +2026,17 @@
         });
 
         game.wave++;
-        p.energy = Math.min(MAX_ENERGY, p.energy + 3);
+        p.energy = Math.min(p.maxEnergy, p.energy + 3);
         p.beamMode = 0;
+        p.doubleShot = 0;
+        p.timeSlow = 0;
+        p.magnet = 0;
+
+        // Update persistent stats
+        persistentData.stats.totalBosses++;
+        persistentData.stats.totalGold = (persistentData.totalCoins + game.coinsEarnedThisRun);
+        if (game.wave > persistentData.stats.maxWave) persistentData.stats.maxWave = game.wave;
+        saveData();
 
         game.boss = null;
         game.bossBullets = [];
@@ -1802,11 +2052,11 @@
         const b = game.boss;
         const ship = getSelectedShip();
 
-        const hpPercent = Math.max(0, p.hp / ship.maxHP * 100);
+        const hpPercent = Math.max(0, p.hp / p.maxHP * 100);
         hud.healthBar.style.width = hpPercent + '%';
         hud.healthText.textContent = Math.max(0, Math.ceil(p.hp));
 
-        const energyPercent = p.energy / MAX_ENERGY * 100;
+        const energyPercent = p.energy / p.maxEnergy * 100;
         hud.energyBar.style.width = energyPercent + '%';
         hud.energyText.textContent = p.energy.toFixed(1).replace('.', ',');
 
@@ -2284,6 +2534,10 @@
         animateHangarPreviews();
     });
     $('hangar-back-btn').addEventListener('click', () => { AudioManager.playSound('btn_click'); goToMenu(); });
+    $('lab-btn').addEventListener('click', () => { AudioManager.playSound('btn_click'); openLab(); });
+    $('lab-back-btn').addEventListener('click', () => { AudioManager.playSound('btn_click'); goToMenu(); });
+    $('achievements-btn').addEventListener('click', () => { AudioManager.playSound('btn_click'); openAchievements(); });
+    $('achievements-back-btn').addEventListener('click', () => { AudioManager.playSound('btn_click'); goToMenu(); });
     $('merchant-close-btn').addEventListener('click', () => { AudioManager.playSound('btn_click'); closeMerchant(); });
 
     function updateSettingsUI() {

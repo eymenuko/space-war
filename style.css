@@ -1343,3 +1343,245 @@ body {
     right: auto;
     left: 20px;
 }
+
+/* Lab & Achievement Screens */
+.lab-content, .achievements-content {
+    width: 90%;
+    max-width: 800px;
+    height: 85vh;
+    background: rgba(10, 15, 30, 0.95);
+    border: 2px solid var(--accent);
+    border-radius: 20px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 40px rgba(0, 245, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.lab-header, .achievements-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    border-bottom: 1px solid rgba(0, 245, 255, 0.2);
+    padding-bottom: 15px;
+}
+
+.upgrade-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.upgrade-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    transition: all 0.3s ease;
+}
+
+.upgrade-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--accent);
+}
+
+.upgrade-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.upgrade-name {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 1.1rem;
+}
+
+.upgrade-level {
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+.upgrade-bar-bg {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.upgrade-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #7b2ff7);
+    width: 0%;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.upgrade-action {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 5px;
+}
+
+.upgrade-cost {
+    font-weight: 600;
+    color: #ffd700;
+}
+
+.upgrade-btn {
+    padding: 8px 15px;
+    font-size: 0.8rem;
+    min-width: 100px;
+}
+
+.upgrade-btn.maxed {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: #666 !important;
+    cursor: default;
+}
+
+/* Achievements List */
+.achievements-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.achievement-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    opacity: 0.6;
+    filter: grayscale(1);
+    transition: all 0.4s ease;
+}
+
+.achievement-item.unlocked {
+    opacity: 1;
+    filter: grayscale(0);
+    border-color: #ffd700;
+    background: rgba(255, 215, 0, 0.05);
+}
+
+.achievement-icon {
+    font-size: 2.5rem;
+}
+
+.achievement-details {
+    flex: 1;
+}
+
+.achievement-title {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    margin-bottom: 5px;
+    color: #fff;
+}
+
+.achievement-desc {
+    font-size: 0.85rem;
+    color: #bbb;
+}
+
+/* Boss Dialogue Box */
+.dialogue-container {
+    position: absolute;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    width: 80%;
+    max-width: 600px;
+    background: rgba(0, 0, 0, 0.85);
+    border-left: 5px solid var(--accent);
+    border-right: 5px solid var(--accent);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.dialogue-container.active {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: all;
+}
+
+.dialogue-portrait {
+    font-size: 3.5rem;
+    width: 80px;
+    height: 80px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255,255,255,0.1);
+}
+
+.dialogue-content {
+    flex: 1;
+}
+
+.dialogue-name {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.dialogue-text {
+    font-size: 1rem;
+    line-height: 1.4;
+    color: #fff;
+    font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .lab-content, .achievements-content {
+        padding: 15px;
+        height: 90vh;
+    }
+    
+    .upgrade-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .dialogue-container {
+        width: 95%;
+        top: 80px;
+        padding: 15px;
+    }
+    
+    .dialogue-portrait {
+        font-size: 2.5rem;
+        width: 60px;
+        height: 60px;
+    }
+}
