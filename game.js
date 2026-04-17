@@ -252,13 +252,44 @@
         }
     };
 
+    // ===== MULTI-LANGUAGE SYSTEM =====
+    function applyLanguage() {
+        const lang = persistentData.language || 'tr';
+        const dict = translations[lang] || translations['tr'];
+        
+        // Update all elements with data-i18n
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (dict[key]) {
+                el.textContent = dict[key];
+            }
+        });
+
+        // Set RTL for Arabic
+        if (lang === 'ar') {
+            document.documentElement.setAttribute('dir', 'rtl');
+        } else {
+            document.documentElement.removeAttribute('dir');
+        }
+
+        const langSelect = $('language-select');
+        if (langSelect && langSelect.value !== lang) {
+            langSelect.value = lang;
+        }
+    }
+
+    function t(key) {
+        const lang = persistentData.language || 'tr';
+        return translations[lang][key] || translations['tr'][key] || key;
+    }
+
     // ===== SHIP DEFINITIONS =====
     const SHIP_TYPES = [
         {
             id: 'star_hunter',
-            name: 'Yıldız Avcısı',
+            get name() { return t('ship_star_hunter'); },
             emoji: '🚀',
-            description: 'Dengeli başlangıç gemisi',
+            get description() { return t('desc_star_hunter'); },
             price: 0,
             color: '#00f5ff',
             glowColor: 'rgba(0,245,255,0.4)',
@@ -275,8 +306,8 @@
             shotCooldown: 12,
             superCooldown: 30,
             superDamage: 25,
-            attackDesc: 'Tek mermi (12 hasar)',
-            superDesc: 'Üçlü yayılım (25×3 hasar)',
+            get attackDesc() { return t('atk_star_hunter'); },
+            get superDesc() { return t('sup_star_hunter'); },
             // Stat ratings for display (out of 10)
             hpRating: 5,
             speedRating: 5,
@@ -373,27 +404,27 @@
         },
         {
             id: 'red_hawk',
-            name: 'Kızıl Şahin',
+            get name() { return t('ship_red_hawk'); },
             emoji: '🦅',
-            description: 'Hızlı ve çift ateşli savaşçı',
+            get description() { return t('desc_red_hawk'); },
             price: 500,
-            color: '#ff4444',
-            glowColor: 'rgba(255,68,68,0.4)',
-            accentColor: '#cc2200',
-            darkColor: '#661100',
+            color: '#ff2d55',
+            glowColor: 'rgba(255,45,85,0.4)',
+            accentColor: '#cc0033',
+            darkColor: '#660011',
             maxHP: 80,
             speed: 8,
-            energyGain: 0.012,
-            shotCost: 1,
+            energyGain: 0.015,
+            shotCost: 0.5,
             superCost: 5,
             shotDamage: 8,
-            shotSpeed: 14,
+            shotSpeed: 15,
             shotSize: 3,
             shotCooldown: 8,
             superCooldown: 25,
             superDamage: 15,
-            attackDesc: 'Çift mermi (8×2 hasar)',
-            superDesc: 'Alev yağmuru (15×8 hasar)',
+            get attackDesc() { return t('atk_red_hawk'); },
+            get superDesc() { return t('sup_red_hawk'); },
             hpRating: 3,
             speedRating: 8,
             damageRating: 6,
@@ -492,28 +523,28 @@
             }
         },
         {
-            id: 'titan_shield',
-            name: 'Titan Kalkanı',
+            id: 'titan',
+            get name() { return t('ship_titan'); },
             emoji: '🛡️',
-            description: 'Dayanıklı tank gemisi',
-            price: 800,
-            color: '#ffd700',
-            glowColor: 'rgba(255,215,0,0.4)',
-            accentColor: '#cc9900',
-            darkColor: '#664400',
-            maxHP: 150,
+            get description() { return t('desc_titan'); },
+            price: 1200,
+            color: '#ff9900',
+            glowColor: 'rgba(255,153,0,0.4)',
+            accentColor: '#cc7a00',
+            darkColor: '#663d00',
+            maxHP: 200,
             speed: 4,
             energyGain: 0.008,
-            shotCost: 1.5,
-            superCost: 5,
-            shotDamage: 18,
-            shotSpeed: 9,
-            shotSize: 6,
-            shotCooldown: 18,
-            superCooldown: 45,
-            superDamage: 60,
-            attackDesc: 'Ağır mermi (18 hasar)',
-            superDesc: 'Şok dalgası (60 hasar + mermi sil)',
+            shotCost: 2,
+            superCost: 8,
+            shotDamage: 20,
+            shotSpeed: 8,
+            shotSize: 8,
+            shotCooldown: 20,
+            superCooldown: 60,
+            superDamage: 50,
+            get attackDesc() { return t('atk_titan'); },
+            get superDesc() { return t('sup_titan'); },
             hpRating: 9,
             speedRating: 3,
             damageRating: 7,
@@ -542,222 +573,14 @@
                     x: p.x, y: p.y, color: '#ffd700',
                     size: canvas.width, life: 20, maxLife: 20
                 });
-                game.screenShake = 12;
-                game.shakeIntensity = 10;
-                showMessage('💥 ŞOK DALGASI!', '#ffd700');
+                game.screenShake = 6;
+                game.shakeIntensity = 5;
+                showMessage(t('msg_dragon_breath'), '#00ff88');
             },
             drawShip: function (ctx, p) {
                 const thruster = Math.sin(p.thrusterPhase) * 0.3 + 0.7;
 
                 // Engine glow
-                const eg = ctx.createRadialGradient(0, p.height / 2 + 5, 0, 0, p.height / 2 + 5, 22 * thruster);
-                eg.addColorStop(0, `rgba(255,200,0,${0.8 * thruster})`);
-                eg.addColorStop(0.5, `rgba(255,150,0,${0.4 * thruster})`);
-                eg.addColorStop(1, 'transparent');
-                ctx.fillStyle = eg;
-                ctx.fillRect(-22, p.height / 2 - 5, 44, 30);
-
-                ctx.beginPath();
-                ctx.moveTo(-10, p.height / 2);
-                ctx.lineTo(0, p.height / 2 + 10 + 8 * thruster);
-                ctx.lineTo(10, p.height / 2);
-                ctx.fillStyle = `rgba(255,220,100,${0.7 * thruster})`;
-                ctx.fill();
-
-                ctx.shadowColor = '#ffd700';
-                ctx.shadowBlur = 18;
-
-                // Wide heavy body
-                ctx.beginPath();
-                ctx.moveTo(0, -p.height / 2 + 5);
-                ctx.lineTo(-p.width / 2 - 4, p.height / 5);
-                ctx.lineTo(-p.width / 2 - 2, p.height / 2 - 5);
-                ctx.lineTo(-p.width / 4, p.height / 2);
-                ctx.lineTo(p.width / 4, p.height / 2);
-                ctx.lineTo(p.width / 2 + 2, p.height / 2 - 5);
-                ctx.lineTo(p.width / 2 + 4, p.height / 5);
-                ctx.closePath();
-
-                const grad = ctx.createLinearGradient(0, -p.height / 2, 0, p.height / 2);
-                grad.addColorStop(0, '#ffd700');
-                grad.addColorStop(0.4, '#cc9900');
-                grad.addColorStop(1, '#664400');
-                ctx.fillStyle = grad;
-                ctx.fill();
-                ctx.strokeStyle = '#ffdd44';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-
-                // Shield emblem
-                ctx.beginPath();
-                ctx.arc(0, 0, 8, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(255,255,255,0.15)';
-                ctx.fill();
-                ctx.strokeStyle = '#ffd700';
-                ctx.lineWidth = 1.5;
-                ctx.stroke();
-
-                // Cockpit
-                ctx.beginPath();
-                ctx.ellipse(0, -8, 7, 9, 0, 0, Math.PI * 2);
-                ctx.fillStyle = '#ffdd44';
-                ctx.globalAlpha = 0.5;
-                ctx.fill();
-                ctx.globalAlpha = 1;
-            }
-        },
-        {
-            id: 'ghost_blade',
-            name: 'Hayalet Kama',
-            emoji: '👻',
-            description: 'Ultra hızlı gizli savaşçı',
-            price: 1200,
-            color: '#c850c0',
-            glowColor: 'rgba(200,80,192,0.4)',
-            accentColor: '#9030a0',
-            darkColor: '#4a1060',
-            maxHP: 60,
-            speed: 10,
-            energyGain: 0.015,
-            shotCost: 0.8,
-            superCost: 6,
-            shotDamage: 6,
-            shotSpeed: 16,
-            shotSize: 3,
-            shotCooldown: 6,
-            superCooldown: 35,
-            superDamage: 0,
-            attackDesc: 'Hızlı çift mermi (6×2 hasar)',
-            superDesc: 'Faz kayması (5sn dokunulmazlık + oto-ateş)',
-            hpRating: 2,
-            speedRating: 10,
-            damageRating: 4,
-            fireShot: function (game, p) {
-                AudioManager.playSound('ghost_blade_shot');
-                for (let dx = -6; dx <= 6; dx += 12) {
-                    game.playerBullets.push({
-                        x: p.x + dx, y: p.y - p.height / 2,
-                        vx: 0, vy: -this.shotSpeed,
-                        size: this.shotSize, damage: this.shotDamage,
-                        isSuper: false, life: 80, trail: [],
-                        color: this.color
-                    });
-                }
-                spawnParticles(p.x, p.y - p.height / 2, this.color, 3, 1.5);
-            },
-            fireSuper: function (game, p) {
-                AudioManager.playSound('ghost_blade_super');
-                // Phase shift: invincibility + auto fire
-                p.invincible = 300; // 5 seconds
-                p.autoFire = 300;
-                game.screenShake = 4;
-                game.shakeIntensity = 3;
-                spawnParticles(p.x, p.y, '#c850c0', 30, 6);
-                showMessage('👻 FAZ KAYMASI!', '#c850c0');
-            },
-            drawShip: function (ctx, p) {
-                const thruster = Math.sin(p.thrusterPhase) * 0.3 + 0.7;
-                const ghostAlpha = p.invincible > 0 ? 0.5 + Math.sin(p.thrusterPhase * 5) * 0.2 : 1;
-
-                ctx.globalAlpha = ghostAlpha;
-
-                // Subtle engine
-                const eg = ctx.createRadialGradient(0, p.height / 2 + 3, 0, 0, p.height / 2 + 3, 12 * thruster);
-                eg.addColorStop(0, `rgba(200,80,192,${0.7 * thruster})`);
-                eg.addColorStop(1, 'transparent');
-                ctx.fillStyle = eg;
-                ctx.fillRect(-12, p.height / 2 - 3, 24, 20);
-
-                ctx.beginPath();
-                ctx.moveTo(-4, p.height / 2);
-                ctx.lineTo(0, p.height / 2 + 10 + 6 * thruster);
-                ctx.lineTo(4, p.height / 2);
-                ctx.fillStyle = `rgba(200,80,192,${0.6 * thruster})`;
-                ctx.fill();
-
-                ctx.shadowColor = '#c850c0';
-                ctx.shadowBlur = 12;
-
-                // Slim dagger shape
-                ctx.beginPath();
-                ctx.moveTo(0, -p.height / 2 - 8);
-                ctx.lineTo(-p.width / 4, -p.height / 6);
-                ctx.lineTo(-p.width / 2, p.height / 4);
-                ctx.lineTo(-p.width / 3, p.height / 2);
-                ctx.lineTo(p.width / 3, p.height / 2);
-                ctx.lineTo(p.width / 2, p.height / 4);
-                ctx.lineTo(p.width / 4, -p.height / 6);
-                ctx.closePath();
-
-                const grad = ctx.createLinearGradient(0, -p.height / 2, 0, p.height / 2);
-                grad.addColorStop(0, '#c850c0');
-                grad.addColorStop(0.5, '#9030a0');
-                grad.addColorStop(1, '#4a1060');
-                ctx.fillStyle = grad;
-                ctx.fill();
-                ctx.strokeStyle = '#dd70dd';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-
-                // Cockpit
-                ctx.beginPath();
-                ctx.ellipse(0, -6, 4, 7, 0, 0, Math.PI * 2);
-                ctx.fillStyle = '#dd88dd';
-                ctx.globalAlpha = ghostAlpha * 0.5;
-                ctx.fill();
-                ctx.globalAlpha = 1;
-            }
-        },
-        {
-            id: 'plasma_dragon',
-            name: 'Plazma Ejderi',
-            emoji: '🐉',
-            description: 'Güçlü plazma silahlarıyla donatılmış',
-            price: 2000,
-            color: '#00ff88',
-            glowColor: 'rgba(0,255,136,0.4)',
-            accentColor: '#00aa55',
-            darkColor: '#005522',
-            maxHP: 120,
-            speed: 5,
-            energyGain: 0.009,
-            shotCost: 1.2,
-            superCost: 6,
-            shotDamage: 20,
-            shotSpeed: 10,
-            shotSize: 7,
-            shotCooldown: 16,
-            superCooldown: 40,
-            superDamage: 10,
-            attackDesc: 'Plazma topu (20 hasar)',
-            superDesc: 'Ejder nefesi (3sn sürekli ışın)',
-            hpRating: 7,
-            speedRating: 4,
-            damageRating: 10,
-            fireShot: function (game, p) {
-                AudioManager.playSound('plasma_dragon_shot');
-                game.playerBullets.push({
-                    x: p.x, y: p.y - p.height / 2,
-                    vx: 0, vy: -this.shotSpeed,
-                    size: this.shotSize, damage: this.shotDamage,
-                    isSuper: false, life: 100, trail: [],
-                    color: this.color
-                });
-                spawnParticles(p.x, p.y - p.height / 2, this.color, 7, 3);
-            },
-            fireSuper: function (game, p) {
-                AudioManager.playSound('plasma_dragon_super');
-                // Dragon breath: beam mode for 3 seconds
-                p.beamMode = 180; // 3 seconds
-                game.screenShake = 4;
-                game.shakeIntensity = 3;
-                spawnParticles(p.x, p.y - p.height / 2, '#00ff88', 20, 5);
-                showMessage('🐉 EJDER NEFESİ!', '#00ff88');
-            },
-            drawShip: function (ctx, p) {
-                const thruster = Math.sin(p.thrusterPhase) * 0.3 + 0.7;
-
-                // Plasma engine glow
                 const eg = ctx.createRadialGradient(0, p.height / 2 + 5, 0, 0, p.height / 2 + 5, 20 * thruster);
                 eg.addColorStop(0, `rgba(0,255,136,${0.8 * thruster})`);
                 eg.addColorStop(0.5, `rgba(0,170,85,${0.4 * thruster})`);
@@ -871,36 +694,43 @@
     const SHOP_ITEMS = [
         {
             id: 'health_potion',
-            name: 'Sağlık İksiri',
+            get name() { return t('item_potion'); },
             emoji: '🧪',
-            description: 'Canını %25 doldurur.',
+            get description() { return t('desc_potion'); },
             price: 100,
             effect: (game) => {
                 const ship = getSelectedShip();
                 game.player.hp = Math.min(ship.maxHP, game.player.hp + Math.floor(ship.maxHP * 0.25));
-                showMessage('❤️ Can Tazelendi!', '#ff2d55');
+                showMessage(t('hp_restored'), '#ff2d55');
             }
         },
         {
             id: 'energy_crystal',
-            name: 'Enerji Kristali',
+            get name() { return t('item_crystal'); },
             emoji: '💎',
-            description: 'Enerjiyi anında fulle.',
+            get description() { return t('desc_crystal'); },
             price: 150,
             effect: (game) => {
                 game.player.energy = MAX_ENERGY;
-                showMessage('⚡ Enerji Fullendi!', '#00f5ff');
+                showMessage(t('energy_full'), '#00f5ff');
             }
         },
         {
             id: 'shield_generator',
-            name: 'Kalkan Jeneratörü',
+            get name() { return t('item_shield'); },
             emoji: '🛡️',
-            description: 'Bir sonraki savaşta 10sn kalkan.',
+            get description() { return t('desc_shield'); },
             price: 300,
             effect: (game) => {
-                game.player.hasShield = true;
-                showMessage('🛡️ Kalkan Hazır!', '#7b2ff7');
+                if (game.player.energy >= 1) {
+                    game.player.energy -= 1;
+                    game.player.hasShield = true;
+                    game.player.shieldTimer = 300;
+                    AudioManager.playSound('powerup');
+                    showMessage(t('shield_active'), '#7b2ff7', 2000);
+                } else {
+                    showMessage(t('insufficient'), '#ff0000', 500);
+                }
             }
         }
     ];
@@ -909,10 +739,12 @@
     let persistentData = {
         totalCoins: 0,
         unlockedShips: ['star_hunter'],
+        ownedShips: ['star_hunter'],
         selectedShip: 'star_hunter',
         touchMode: false,
         sfxEnabled: true,
-        bgmEnabled: true
+        bgmEnabled: true,
+        language: 'tr'
     };
 
     function saveData() {
@@ -979,6 +811,7 @@
                 invincible: 0,
                 thrusterPhase: 0,
                 hasShield: false,
+                shieldTimer: 0,
                 autoFire: 0,
                 beamMode: 0
             },
@@ -1039,13 +872,13 @@
         game.bossSpiralAngle = 0;
 
         hud.bossName.textContent = `${type.emoji} ${type.name}`;
-        showMessage(`⚠️ ${type.name} GELİYOR!`, type.color);
+        showMessage(`⚠️ ${type.name} ${t('msg_incoming')}`, type.color);
 
         // Apply shield if bought
         if (game.player.hasShield) {
             game.player.invincible = 600;
             game.player.hasShield = false;
-            showMessage('🛡️ KALKAN AKTİF!', '#7b2ff7');
+            showMessage(t('shield_active'), '#7b2ff7');
         }
     }
 
@@ -1209,10 +1042,10 @@
     function updateTouchModeUI() {
         if (persistentData.touchMode) {
             hud.touchModeBtn.classList.add('active');
-            hud.touchModeBtn.querySelector('span').textContent = 'DOKUNMATİK MOD: AÇIK';
+            hud.touchModeBtn.querySelector('span').textContent = t('touch_on');
         } else {
             hud.touchModeBtn.classList.remove('active');
-            hud.touchModeBtn.querySelector('span').textContent = 'DOKUNMATİK MOD: KAPALI';
+            hud.touchModeBtn.querySelector('span').textContent = t('touch_off');
         }
     }
 
@@ -1220,7 +1053,7 @@
         persistentData.touchMode = !persistentData.touchMode;
         saveData();
         updateTouchModeUI();
-        showMessage(persistentData.touchMode ? '📱 Dokunmatik Kontroller Aktif' : '⌨️ Klavye Kontrolleri Aktif');
+        showMessage(persistentData.touchMode ? t('msg_touch_on') : t('msg_touch_off'));
     });
 
     // Initialize UI
@@ -1466,10 +1299,10 @@
                         <span class="head-emoji">${head.emoji}</span>
                         <div>
                             <div class="head-name" style="color:${head.color}">${head.name}</div>
-                            <div class="head-wave">Dalga ${head.wave} • HP: ${head.maxHP}</div>
+                            <div class="head-wave">${t('wave')} ${head.wave} • HP: ${head.maxHP}</div>
                         </div>
                     </div>
-                    <button class="sell-btn" data-index="${index}">SAT 🪙${head.value}</button>
+                    <button class="sell-btn" data-index="${index}">${t('sell')} 🪙${head.value}</button>
                 `;
                 hud.headList.appendChild(card);
             });
@@ -1506,7 +1339,7 @@
                     </div>
                 </div>
                 <button class="buy-btn" data-id="${item.id}" ${disabled ? 'disabled' : ''}>
-                    ${alreadyBoughtShield ? 'AKTIF' : `AL 🪙${item.price}`}
+                    ${alreadyBoughtShield ? t('active') : `${t('buy')} 🪙${item.price}`}
                 </button>
             `;
             hud.shopList.appendChild(card);
@@ -1559,6 +1392,12 @@
         if (superCooldown > 0) superCooldown--;
         if (keys['Space']) firePlayerShot(false);
         if (keys['KeyZ']) firePlayerShot(true);
+
+        // --- Shield logic ---
+        if (p.shieldTimer > 0) {
+            p.shieldTimer--;
+            if (p.shieldTimer <= 0) p.hasShield = false;
+        }
 
         // --- Auto-fire (Ghost Blade ulti) ---
         if (p.autoFire > 0) {
@@ -1647,6 +1486,16 @@
 
                 game.combo++;
                 game.comboTimer = 60;
+                
+                if (game.combo >= 10 && game.combo % 10 === 0) {
+                    showMessage(t('serial_killer'), '#ff2d55', 2000);
+                    game.player.energy = Math.min(MAX_ENERGY, game.player.energy + 2);
+                } else if (game.combo >= 5 && game.combo % 5 === 0) {
+                    showMessage(t('perfect'), '#00ff88');
+                    game.player.energy = Math.min(MAX_ENERGY, game.player.energy + 1);
+                } else if (game.combo >= 3 && game.combo % 3 === 0) {
+                    showMessage(t('good'), '#ffff00');
+                }
 
                 if (b.hp <= 0) {
                     onBossDefeated(b, p);
@@ -1663,20 +1512,28 @@
 
             if (p.invincible <= 0 && circlesCollide(bullet, p, bullet.size, 35)) {
                 if (checkPixelCollision(p.x, p.y, bullet.x, bullet.y, bullet.size)) {
-                    AudioManager.playSound('hit');
-                    const dmg = 8 + Math.floor(game.wave * 1.5);
-                    p.hp -= dmg;
-                    bullet.life = 0;
-                    p.invincible = 30;
-                    spawnParticles(p.x, p.y, '#ff2d55', 12, 4);
-                    spawnDamageNumber(p.x, p.y - 30, dmg, '#ff2d55');
-                    game.screenShake = 6;
-                    game.shakeIntensity = 5;
-                    game.combo = 0;
+                    if (p.hasShield) {
+                        p.hasShield = false;
+                        p.shieldTimer = 0;
+                        p.invincible = 60;
+                        AudioManager.playSound('shield_break');
+                        showMessage(t('shield_broken'), '#ffffff');
+                    } else {
+                        AudioManager.playSound('hit');
+                        const dmg = 8 + Math.floor(game.wave * 1.5);
+                        p.hp -= dmg;
+                        bullet.life = 0;
+                        p.invincible = 30;
+                        spawnParticles(p.x, p.y, '#ff2d55', 12, 4);
+                        spawnDamageNumber(p.x, p.y - 30, dmg, '#ff2d55');
+                        game.screenShake = 6;
+                        game.shakeIntensity = 5;
+                        game.combo = 0;
 
-                    if (p.hp <= 0) {
-                        gameOver();
-                        return;
+                        if (p.hp <= 0) {
+                            gameOver();
+                            return;
+                        }
                     }
                 }
             }
@@ -1726,7 +1583,7 @@
         const bonusScore = 500 * game.wave;
         game.score += bonusScore;
         game.bossKills++;
-        showMessage(`🎉 ${b.name} YOK EDİLDİ! +${bonusScore}`, '#00ff88');
+        showMessage(`${t('msg_boss_dead')} ${b.name}! +${bonusScore}`, '#00ff88');
 
         const headValue = Math.floor(50 + b.maxHP * 0.5 + game.wave * 20);
         game.bossHeads.push({
@@ -1776,7 +1633,7 @@
 
         if (game.combo >= 3) {
             hud.comboDisplay.classList.remove('hidden');
-            hud.comboDisplay.textContent = `${game.combo}x COMBO!`;
+            hud.comboDisplay.textContent = `${game.combo}x ${t('combo')}`;
             hud.comboDisplay.style.color = game.combo >= 10 ? '#ff2d95' : game.combo >= 5 ? '#ffaa00' : '#00f5ff';
             hud.comboDisplay.style.textShadow = `0 0 30px ${hud.comboDisplay.style.color}`;
         } else {
@@ -1927,11 +1784,11 @@
         ctx.restore();
 
         // Shield visual
-        if (p.invincible > 0) {
+        if (p.hasShield) {
             ctx.save();
             ctx.beginPath();
             ctx.arc(p.x, p.y, 35, 0, Math.PI * 2);
-            ctx.strokeStyle = `rgba(${ship.id === 'ghost_blade' ? '200,80,192' : '0,245,255'},${0.3 + Math.sin(p.thrusterPhase * 3) * 0.2})`;
+            ctx.strokeStyle = `rgba(123,47,247,${0.3 + Math.sin(p.thrusterPhase * 3) * 0.2})`;
             ctx.lineWidth = 2;
             ctx.stroke();
             ctx.restore();
@@ -2117,26 +1974,15 @@
         grid.innerHTML = '';
 
         SHIP_TYPES.forEach(ship => {
-            const isUnlocked = persistentData.unlockedShips.includes(ship.id);
+            const isOwned = persistentData.ownedShips.includes(ship.id);
             const isSelected = persistentData.selectedShip === ship.id;
             const canAfford = persistentData.totalCoins >= ship.price;
 
             const card = document.createElement('div');
-            card.className = `ship-card${isSelected ? ' selected' : ''}${!isUnlocked ? ' locked' : ''}`;
-
-            let actionHTML = '';
-            if (!isUnlocked) {
-                actionHTML = `<button class="ship-buy-btn buy" data-id="${ship.id}" ${!canAfford ? 'disabled' : ''}>
-                    SATIN AL 🪙${ship.price}
-                </button>`;
-            } else if (isSelected) {
-                actionHTML = `<button class="ship-buy-btn selected-state" disabled>✓ SEÇİLİ</button>`;
-            } else {
-                actionHTML = `<button class="ship-buy-btn select" data-id="${ship.id}">SEÇ</button>`;
-            }
+            card.className = `ship-card${isSelected ? ' selected' : ''}${!isOwned ? ' locked' : ''}`;
 
             card.innerHTML = `
-                ${!isUnlocked ? '<div class="ship-lock-overlay"><span class="lock-icon">🔒</span></div>' : ''}
+                ${!isOwned ? '<div class="ship-lock-overlay"><span class="lock-icon">🔒</span></div>' : ''}
                 <div class="ship-card-header">
                     <div class="ship-preview">
                         <canvas data-ship-id="${ship.id}" width="56" height="56"></canvas>
@@ -2164,10 +2010,39 @@
                     <div class="ship-ability"><span class="ability-key">SPACE</span> ${ship.attackDesc}</div>
                     <div class="ship-ability"><span class="ability-key">Z</span> ${ship.superDesc}</div>
                 </div>
-                <div class="ship-card-action">${actionHTML}</div>
+                <div class="ship-card-action"><button class="buy-btn"></button></div>
             `;
 
             grid.appendChild(card);
+
+            // Setup button state
+            const buyBtn = card.querySelector('.buy-btn');
+            if (isOwned) {
+                if (isSelected) {
+                    buyBtn.innerHTML = t('selected_btn');
+                    buyBtn.classList.add('selected');
+                } else {
+                    buyBtn.innerHTML = t('select_btn');
+                    buyBtn.classList.add('owned');
+                    buyBtn.onclick = () => {
+                        persistentData.selectedShip = ship.id;
+                        saveData();
+                        AudioManager.playSound('btn_click');
+                        updateHangarUI();
+                    };
+                }
+            } else {
+                buyBtn.innerHTML = t('buy_btn').replace('{price}', ship.price);
+                if (!canAfford) buyBtn.disabled = true;
+                buyBtn.onclick = () => {
+                    persistentData.totalCoins -= ship.price;
+                    persistentData.ownedShips.push(ship.id);
+                    persistentData.selectedShip = ship.id;
+                    saveData();
+                    AudioManager.playSound('btn_click');
+                    updateHangarUI();
+                };
+            }
 
             // Draw ship preview on mini canvas
             setTimeout(() => {
@@ -2176,32 +2051,6 @@
                     drawShipPreview(miniCanvas, ship);
                 }
             }, 50);
-        });
-
-        // Attach handlers
-        grid.querySelectorAll('.ship-buy-btn.buy').forEach(btn => {
-            btn.addEventListener('click', e => {
-                e.stopPropagation();
-                const id = btn.dataset.id;
-                const ship = SHIP_TYPES.find(s => s.id === id);
-                if (ship && persistentData.totalCoins >= ship.price) {
-                    persistentData.totalCoins -= ship.price;
-                    persistentData.unlockedShips.push(ship.id);
-                    persistentData.selectedShip = ship.id;
-                    saveData();
-                    updateHangarUI();
-                }
-            });
-        });
-
-        grid.querySelectorAll('.ship-buy-btn.select').forEach(btn => {
-            btn.addEventListener('click', e => {
-                e.stopPropagation();
-                const id = btn.dataset.id;
-                persistentData.selectedShip = id;
-                saveData();
-                updateHangarUI();
-            });
         });
     }
 
@@ -2249,8 +2098,8 @@
     $('merchant-close-btn').addEventListener('click', () => { AudioManager.playSound('btn_click'); closeMerchant(); });
 
     function updateSettingsUI() {
-        $('toggle-sfx-btn').querySelector('span').textContent = persistentData.sfxEnabled ? 'SES EFEKTLERİ: AÇIK' : 'SES EFEKTLERİ: KAPALI';
-        $('toggle-bgm-btn').querySelector('span').textContent = persistentData.bgmEnabled ? 'MÜZİK: AÇIK' : 'MÜZİK: KAPALI';
+        $('toggle-sfx-btn').querySelector('span').textContent = persistentData.sfxEnabled ? t('sfx_on') : t('sfx_off');
+        $('toggle-bgm-btn').querySelector('span').textContent = persistentData.bgmEnabled ? t('bgm_on') : t('bgm_off');
     }
 
     $('settings-open-btn').addEventListener('click', () => {
@@ -2274,8 +2123,21 @@
     $('toggle-bgm-btn').addEventListener('click', () => {
         persistentData.bgmEnabled = !persistentData.bgmEnabled;
         saveData();
-        updateSettingsUI();
         AudioManager.playSound('btn_click');
+        if (persistentData.bgmEnabled) {
+            AudioManager.playBGM();
+        } else {
+            AudioManager.stopBGM();
+        }
+        updateSettingsUI();
+    });
+
+    $('language-select')?.addEventListener('change', (e) => {
+        persistentData.language = e.target.value;
+        saveData();
+        AudioManager.playSound('btn_click');
+        applyLanguage();
+        updateSettingsUI();
     });
 
     // Start with keyboard too

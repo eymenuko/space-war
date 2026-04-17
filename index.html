@@ -23,7 +23,7 @@
         <div class="start-content">
             <h1 class="game-title">
                 <span class="title-icon">🚀</span>
-                UZAY SAVAŞI
+                <span data-i18n="title">UZAY SAVAŞI</span>
                 <span class="title-icon">👾</span>
             </h1>
             <p class="subtitle">Alien Boss Battle</p>
@@ -33,19 +33,19 @@
             </div>
             <div class="menu-coins-display">🪙 <span id="menu-coins">0</span></div>
             <div class="start-instructions">
-                <div class="instruction-item"><span class="key">◀ ▶</span> Sağ-Sol Hareket</div>
-                <div class="instruction-item"><span class="key">SPACE</span> Enerji Saldırısı</div>
-                <div class="instruction-item"><span class="key">Z</span> Süper Saldırı</div>
+                <div class="instruction-item"><span class="key">◀ ▶</span> <span data-i18n="instruction_move">Sağ-Sol Hareket</span></div>
+                <div class="instruction-item"><span class="key">SPACE</span> <span data-i18n="instruction_shoot">Enerji Saldırısı</span></div>
+                <div class="instruction-item"><span class="key">Z</span> <span data-i18n="instruction_super">Süper Saldırı</span></div>
             </div>
             <div class="menu-buttons">
                 <button id="start-btn" class="neon-btn">
-                    <span>SAVAŞA BAŞLA</span>
+                    <span data-i18n="start_game">SAVAŞA BAŞLA</span>
                 </button>
                 <button id="touch-mode-btn" class="neon-btn touch-toggle">
-                    <span>DOKUNMATİK MOD: KAPALI</span>
+                    <span data-i18n="touch_off">DOKUNMATİK MOD: KAPALI</span>
                 </button>
                 <button id="hangar-btn" class="neon-btn hangar">
-                    <span>🚀 GEMİLER</span>
+                    <span data-i18n="hangar">🚀 GEMİLER</span>
                 </button>
             </div>
         </div>
@@ -56,15 +56,15 @@
         <div class="stars-bg"></div>
         <div class="hangar-content">
             <div class="hangar-header">
-                <h1 class="hangar-title">🚀 UZAY HANGARI</h1>
-                <div class="hangar-coins">🪙 <span id="hangar-coins">0</span> Altın</div>
+                <h1 class="hangar-title" data-i18n="hangar_title">🚀 UZAY HANGARI</h1>
+                <div class="hangar-coins">🪙 <span id="hangar-coins">0</span> <span data-i18n="gold">Altın</span></div>
             </div>
             <div id="ship-grid" class="ship-grid">
                 <!-- Ship cards will be injected here -->
             </div>
             <div class="hangar-footer">
                 <button id="hangar-back-btn" class="neon-btn">
-                    <span>◀ GERİ</span>
+                    <span data-i18n="back">◀ GERİ</span>
                 </button>
             </div>
         </div>
@@ -77,14 +77,14 @@
         <div id="hud">
             <div class="hud-left">
                 <div class="hud-item">
-                    <span class="hud-label">❤️ CAN</span>
+                    <span class="hud-label" data-i18n="hp">❤️ CAN</span>
                     <div class="bar-container">
                         <div id="health-bar" class="bar health-bar"></div>
                     </div>
                     <span id="health-text" class="bar-text">100</span>
                 </div>
                 <div class="hud-item">
-                    <span class="hud-label">⚡ ENERJİ</span>
+                    <span class="hud-label" data-i18n="energy">⚡ ENERJİ</span>
                     <div class="bar-container energy-container">
                         <div id="energy-bar" class="bar energy-bar"></div>
                     </div>
@@ -92,12 +92,12 @@
                 </div>
             </div>
             <div class="hud-center">
-                <div id="score-display">SKOR: <span id="score">0</span></div>
-                <div id="wave-display">DALGA: <span id="wave">1</span></div>
+                <div id="score-display"><span data-i18n="score">SKOR:</span> <span id="score">0</span></div>
+                <div id="wave-display"><span data-i18n="wave">DALGA:</span> <span id="wave">1</span></div>
             </div>
             <div class="hud-right">
                 <div class="hud-item boss-info">
-                    <span class="hud-label">👾 BOSS</span>
+                    <span class="hud-label" data-i18n="boss">👾 BOSS</span>
                     <div class="bar-container">
                         <div id="boss-health-bar" class="bar boss-health-bar"></div>
                     </div>
@@ -115,26 +115,26 @@
             <div class="merchant-panel">
                 <div class="merchant-header">
                     <span class="merchant-emoji">🛸</span>
-                    <h2 class="merchant-title">SEYYAR UZAY SATICISI</h2>
-                    <p class="merchant-subtitle">"Taze kelle alırım, iyi fiyat veririm!"</p>
+                    <h2 class="merchant-title" data-i18n="merchant_title">SEYYAR UZAY SATICISI</h2>
+                    <p class="merchant-subtitle" data-i18n="merchant_subtitle">"Taze kelle alırım, iyi fiyat veririm!"</p>
                 </div>
                 <div class="merchant-inventory">
-                    <h3 class="inventory-title">🎒 Boss Kelleleri</h3>
+                    <h3 class="inventory-title" data-i18n="boss_heads">🎒 Boss Kelleleri</h3>
                     <div id="head-list" class="head-list">
                         <!-- Boss heads will be injected here -->
                     </div>
-                    <div id="no-heads" class="no-heads">Satılacak kelle yok...</div>
+                    <div id="no-heads" class="no-heads" data-i18n="no_heads">Satılacak kelle yok...</div>
                 </div>
                 <div class="merchant-shop">
-                    <h3 class="inventory-title">🛒 Uzay Marketi</h3>
+                    <h3 class="inventory-title" data-i18n="shop">🛒 Uzay Marketi</h3>
                     <div id="shop-list" class="shop-list">
                         <!-- Shop items will be injected here -->
                     </div>
                 </div>
                 <div class="merchant-footer">
-                    <div class="merchant-wallet">🪙 <span id="merchant-coins">0</span> Altın</div>
+                    <div class="merchant-wallet">🪙 <span id="merchant-coins">0</span> <span data-i18n="gold">Altın</span></div>
                     <button id="merchant-close-btn" class="neon-btn merchant-btn">
-                        <span>DEVAM ET ▶</span>
+                        <span data-i18n="continue">DEVAM ET ▶</span>
                     </button>
                 </div>
             </div>
@@ -160,23 +160,23 @@
     <div id="gameover-screen" class="screen">
         <div class="stars-bg"></div>
         <div class="gameover-content">
-            <h1 class="gameover-title">💀 YENİLDİN!</h1>
+            <h1 class="gameover-title" data-i18n="game_over">💀 YENİLDİN!</h1>
             <div id="final-stats">
-                <div class="stat-item"><span class="stat-label">Skor</span><span id="final-score"
+                <div class="stat-item"><span class="stat-label" data-i18n="final_score">Skor</span><span id="final-score"
                         class="stat-value">0</span></div>
-                <div class="stat-item"><span class="stat-label">Dalga</span><span id="final-wave"
+                <div class="stat-item"><span class="stat-label" data-i18n="final_wave">Dalga</span><span id="final-wave"
                         class="stat-value">0</span></div>
-                <div class="stat-item"><span class="stat-label">Yenilen Boss</span><span id="final-kills"
+                <div class="stat-item"><span class="stat-label" data-i18n="killed_bosses">Yenilen Boss</span><span id="final-kills"
                         class="stat-value">0</span></div>
-                <div class="stat-item earned-coins"><span class="stat-label">Kazanılan Altın</span><span
+                <div class="stat-item earned-coins"><span class="stat-label" data-i18n="earned_gold">Kazanılan Altın</span><span
                         id="final-coins-earned" class="stat-value coins-value">0</span></div>
             </div>
             <div class="gameover-actions">
                 <button id="restart-btn" class="neon-btn restart">
-                    <span>TEKRAR DENE</span>
+                    <span data-i18n="retry">TEKRAR DENE</span>
                 </button>
                 <button id="menu-btn" class="neon-btn menu">
-                    <span>MENÜYE DÖN</span>
+                    <span data-i18n="menu">MENÜYE DÖN</span>
                 </button>
             </div>
         </div>
@@ -186,23 +186,34 @@
     <div id="settings-screen" class="screen">
         <div class="stars-bg"></div>
         <div class="gameover-content">
-            <h1 class="gameover-title">⚙️ AYARLAR</h1>
+            <h1 class="gameover-title" data-i18n="settings_title">⚙️ AYARLAR</h1>
             <div class="settings-options" style="display: flex; flex-direction: column; gap: 15px; margin: 30px 0;">
+                <div class="language-selector" style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,245,255,0.1); padding: 10px 20px; border: 2px solid #00f5ff; border-radius: 10px;">
+                    <span style="font-size: 20px; font-weight: bold; color: #fff;" data-i18n="language">DİL / LANGUAGE</span>
+                    <select id="language-select" style="background: #0a001e; color: #00f5ff; border: 1px solid #00f5ff; padding: 5px 10px; font-family: 'Rajdhani', sans-serif; font-size: 18px; border-radius: 5px; outline: none; cursor: pointer;">
+                        <option value="tr">Türkçe</option>
+                        <option value="en">English</option>
+                        <option value="ru">Русский</option>
+                        <option value="ar">العربية</option>
+                        <option value="el">Ελληνικά</option>
+                    </select>
+                </div>
                 <button id="toggle-sfx-btn" class="neon-btn">
-                    <span>SES EFEKTLERİ: AÇIK</span>
+                    <span data-i18n="sfx_on">SES EFEKTLERİ: AÇIK</span>
                 </button>
                 <button id="toggle-bgm-btn" class="neon-btn">
-                    <span>MÜZİK: AÇIK</span>
+                    <span data-i18n="bgm_on">MÜZİK: AÇIK</span>
                 </button>
             </div>
             <div class="gameover-actions">
                 <button id="settings-close-btn" class="neon-btn menu">
-                    <span>KAPAT</span>
+                    <span data-i18n="close">KAPAT</span>
                 </button>
             </div>
         </div>
     </div>
 
+    <script src="translations.js"></script>
     <script src="game.js"></script>
 </body>
 
