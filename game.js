@@ -573,8 +573,216 @@
                     x: p.x, y: p.y, color: '#ffd700',
                     size: canvas.width, life: 20, maxLife: 20
                 });
+                game.screenShake = 12;
+                game.shakeIntensity = 10;
+                showMessage(t('msg_shockwave'), '#ffd700');
+            },
+            drawShip: function (ctx, p) {
+                const thruster = Math.sin(p.thrusterPhase) * 0.3 + 0.7;
+
+                // Engine glow
+                const eg = ctx.createRadialGradient(0, p.height / 2 + 5, 0, 0, p.height / 2 + 5, 22 * thruster);
+                eg.addColorStop(0, `rgba(255,200,0,${0.8 * thruster})`);
+                eg.addColorStop(0.5, `rgba(255,150,0,${0.4 * thruster})`);
+                eg.addColorStop(1, 'transparent');
+                ctx.fillStyle = eg;
+                ctx.fillRect(-22, p.height / 2 - 5, 44, 30);
+
+                ctx.beginPath();
+                ctx.moveTo(-10, p.height / 2);
+                ctx.lineTo(0, p.height / 2 + 10 + 8 * thruster);
+                ctx.lineTo(10, p.height / 2);
+                ctx.fillStyle = `rgba(255,220,100,${0.7 * thruster})`;
+                ctx.fill();
+
+                ctx.shadowColor = '#ffd700';
+                ctx.shadowBlur = 18;
+
+                // Wide heavy body
+                ctx.beginPath();
+                ctx.moveTo(0, -p.height / 2 + 5);
+                ctx.lineTo(-p.width / 2 - 4, p.height / 5);
+                ctx.lineTo(-p.width / 2 - 2, p.height / 2 - 5);
+                ctx.lineTo(-p.width / 4, p.height / 2);
+                ctx.lineTo(p.width / 4, p.height / 2);
+                ctx.lineTo(p.width / 2 + 2, p.height / 2 - 5);
+                ctx.lineTo(p.width / 2 + 4, p.height / 5);
+                ctx.closePath();
+
+                const grad = ctx.createLinearGradient(0, -p.height / 2, 0, p.height / 2);
+                grad.addColorStop(0, '#ffd700');
+                grad.addColorStop(0.4, '#cc9900');
+                grad.addColorStop(1, '#664400');
+                ctx.fillStyle = grad;
+                ctx.fill();
+                ctx.strokeStyle = '#ffdd44';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Shield emblem
+                ctx.beginPath();
+                ctx.arc(0, 0, 8, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255,255,255,0.15)';
+                ctx.fill();
+                ctx.strokeStyle = '#ffd700';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+
+                // Cockpit
+                ctx.beginPath();
+                ctx.ellipse(0, -8, 7, 9, 0, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffdd44';
+                ctx.globalAlpha = 0.5;
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        },
+        {
+            id: 'ghost',
+            get name() { return t('ship_ghost'); },
+            emoji: '👻',
+            get description() { return t('desc_ghost'); },
+            price: 2500,
+            color: '#c850c0',
+            glowColor: 'rgba(200,80,192,0.4)',
+            accentColor: '#4158d0',
+            darkColor: '#201040',
+            maxHP: 70,
+            speed: 10,
+            energyGain: 0.02,
+            shotCost: 1.5,
+            superCost: 6,
+            shotDamage: 15,
+            shotSpeed: 20,
+            shotSize: 2,
+            shotCooldown: 10,
+            superCooldown: 90,
+            superDamage: 5,
+            get attackDesc() { return t('atk_ghost'); },
+            get superDesc() { return t('sup_ghost'); },
+            hpRating: 2,
+            speedRating: 10,
+            damageRating: 4,
+            fireShot: function (game, p) {
+                AudioManager.playSound('ghost_blade_shot');
+                for (let dx = -6; dx <= 6; dx += 12) {
+                    game.playerBullets.push({
+                        x: p.x + dx, y: p.y - p.height / 2,
+                        vx: 0, vy: -this.shotSpeed,
+                        size: this.shotSize, damage: this.shotDamage,
+                        isSuper: false, life: 80, trail: [],
+                        color: this.color
+                    });
+                }
+                spawnParticles(p.x, p.y - p.height / 2, this.color, 3, 1.5);
+            },
+            fireSuper: function (game, p) {
+                AudioManager.playSound('ghost_blade_super');
+                // Phase shift: invincibility + auto fire
+                p.invincible = 300; // 5 seconds
+                p.autoFire = 300;
+                game.screenShake = 4;
+                game.shakeIntensity = 3;
+                spawnParticles(p.x, p.y, '#c850c0', 30, 6);
+                showMessage(t('msg_ghost_shift'), '#c850c0');
+            },
+            drawShip: function (ctx, p) {
+                const thruster = Math.sin(p.thrusterPhase) * 0.3 + 0.7;
+                const ghostAlpha = p.invincible > 0 ? 0.5 + Math.sin(p.thrusterPhase * 5) * 0.2 : 1;
+
+                ctx.globalAlpha = ghostAlpha;
+
+                // Subtle engine
+                const eg = ctx.createRadialGradient(0, p.height / 2 + 3, 0, 0, p.height / 2 + 3, 12 * thruster);
+                eg.addColorStop(0, `rgba(200,80,192,${0.7 * thruster})`);
+                eg.addColorStop(1, 'transparent');
+                ctx.fillStyle = eg;
+                ctx.fillRect(-12, p.height / 2 - 3, 24, 20);
+
+                ctx.beginPath();
+                ctx.moveTo(-4, p.height / 2);
+                ctx.lineTo(0, p.height / 2 + 10 + 6 * thruster);
+                ctx.lineTo(4, p.height / 2);
+                ctx.fillStyle = `rgba(200,80,192,${0.6 * thruster})`;
+                ctx.fill();
+
+                ctx.shadowColor = '#c850c0';
+                ctx.shadowBlur = 12;
+
+                // Slim dagger shape
+                ctx.beginPath();
+                ctx.moveTo(0, -p.height / 2 - 8);
+                ctx.lineTo(-p.width / 4, -p.height / 6);
+                ctx.lineTo(-p.width / 2, p.height / 4);
+                ctx.lineTo(-p.width / 3, p.height / 2);
+                ctx.lineTo(p.width / 3, p.height / 2);
+                ctx.lineTo(p.width / 2, p.height / 4);
+                ctx.lineTo(p.width / 4, -p.height / 6);
+                ctx.closePath();
+
+                const grad = ctx.createLinearGradient(0, -p.height / 2, 0, p.height / 2);
+                grad.addColorStop(0, '#c850c0');
+                grad.addColorStop(0.5, '#9030a0');
+                grad.addColorStop(1, '#4a1060');
+                ctx.fillStyle = grad;
+                ctx.fill();
+                ctx.strokeStyle = '#dd70dd';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                // Cockpit
+                ctx.beginPath();
+                ctx.ellipse(0, -6, 4, 7, 0, 0, Math.PI * 2);
+                ctx.fillStyle = '#dd88dd';
+                ctx.globalAlpha = ghostAlpha * 0.5;
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        },
+        {
+            id: 'dragon',
+            get name() { return t('ship_dragon'); },
+            emoji: '🐉',
+            get description() { return t('desc_dragon'); },
+            price: 5000,
+            color: '#00ff88',
+            glowColor: 'rgba(0,255,136,0.4)',
+            accentColor: '#00cc66',
+            darkColor: '#003311',
+            maxHP: 150,
+            speed: 5,
+            energyGain: 0.012,
+            shotCost: 3,
+            superCost: 10,
+            shotDamage: 30,
+            shotSpeed: 10,
+            shotSize: 6,
+            shotCooldown: 25,
+            superCooldown: 120,
+            superDamage: 100,
+            get attackDesc() { return t('atk_dragon'); },
+            get superDesc() { return t('sup_dragon'); },
+            hpRating: 7,
+            speedRating: 4,
+            damageRating: 10,
+            fireShot: function (game, p) {
+                AudioManager.playSound('plasma_dragon_shot');
+                game.playerBullets.push({
+                    x: p.x, y: p.y - p.height / 2,
+                    vx: 0, vy: -this.shotSpeed,
+                    size: this.shotSize, damage: this.shotDamage,
+                    isSuper: false, life: 100, trail: [],
+                    color: this.color
+                });
+                spawnParticles(p.x, p.y - p.height / 2, this.color, 7, 3);
+            },
+            fireSuper: function (game, p) {
+                AudioManager.playSound('plasma_dragon_super');
+                // Dragon breath: beam mode for 3 seconds
+                p.beamMode = 180; // 3 seconds
                 game.screenShake = 6;
                 game.shakeIntensity = 5;
+                spawnParticles(p.x, p.y - p.height / 2, '#00ff88', 20, 5);
                 showMessage(t('msg_dragon_breath'), '#00ff88');
             },
             drawShip: function (ctx, p) {
@@ -598,54 +806,35 @@
                 ctx.shadowColor = '#00ff88';
                 ctx.shadowBlur = 18;
 
-                // Dragon-like body with wings
+                // Scale-like angular body
                 ctx.beginPath();
-                ctx.moveTo(0, -p.height / 2 - 3);
-                ctx.lineTo(-p.width / 3, -p.height / 6);
-                ctx.lineTo(-p.width / 2 - 10, p.height / 6);  // wing tip
-                ctx.lineTo(-p.width / 3, p.height / 3);
-                ctx.lineTo(-p.width / 4, p.height / 2);
-                ctx.lineTo(p.width / 4, p.height / 2);
-                ctx.lineTo(p.width / 3, p.height / 3);
-                ctx.lineTo(p.width / 2 + 10, p.height / 6);   // wing tip
-                ctx.lineTo(p.width / 3, -p.height / 6);
+                ctx.moveTo(0, -p.height / 2 - 10);
+                ctx.lineTo(-p.width / 4, -p.height / 4);
+                ctx.lineTo(-p.width / 2 - 8, p.height / 4);
+                ctx.lineTo(-p.width / 3, p.height / 2 - 5);
+                ctx.lineTo(-p.width / 4, p.height / 4);
+                ctx.lineTo(0, p.height / 2 + 5);
+                ctx.lineTo(p.width / 4, p.height / 4);
+                ctx.lineTo(p.width / 3, p.height / 2 - 5);
+                ctx.lineTo(p.width / 2 + 8, p.height / 4);
+                ctx.lineTo(p.width / 4, -p.height / 4);
                 ctx.closePath();
 
                 const grad = ctx.createLinearGradient(0, -p.height / 2, 0, p.height / 2);
                 grad.addColorStop(0, '#00ff88');
-                grad.addColorStop(0.4, '#00aa55');
-                grad.addColorStop(1, '#005522');
+                grad.addColorStop(0.5, '#00cc66');
+                grad.addColorStop(1, '#003311');
                 ctx.fillStyle = grad;
                 ctx.fill();
-                ctx.strokeStyle = '#00ffaa';
+                ctx.strokeStyle = '#55ffa5';
                 ctx.lineWidth = 1.5;
                 ctx.stroke();
 
-                // Dragon eye cockpit
+                // Eye
                 ctx.beginPath();
-                ctx.ellipse(0, -6, 6, 9, 0, 0, Math.PI * 2);
-                ctx.fillStyle = '#00ff88';
-                ctx.globalAlpha = 0.5;
+                ctx.ellipse(0, -6, 3, 5, 0, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffaa00';
                 ctx.fill();
-                ctx.globalAlpha = 1;
-
-                // Slit pupil
-                ctx.beginPath();
-                ctx.ellipse(0, -6, 2, 7, 0, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(0,0,0,0.5)';
-                ctx.fill();
-
-                // Beam effect when in beam mode
-                if (p.beamMode > 0) {
-                    ctx.save();
-                    const beamAlpha = 0.4 + Math.sin(p.thrusterPhase * 8) * 0.2;
-                    const grad2 = ctx.createLinearGradient(0, -p.height / 2, 0, -canvas.height);
-                    grad2.addColorStop(0, `rgba(0,255,136,${beamAlpha})`);
-                    grad2.addColorStop(1, 'transparent');
-                    ctx.fillStyle = grad2;
-                    ctx.fillRect(-6, -canvas.height, 12, canvas.height - p.height / 2);
-                    ctx.restore();
-                }
             }
         }
     ];
@@ -2138,6 +2327,7 @@
         AudioManager.playSound('btn_click');
         applyLanguage();
         updateSettingsUI();
+        updateMenuUI();
     });
 
     // Start with keyboard too
@@ -2154,5 +2344,6 @@
     });
 
     // Initialize menu on load
+    applyLanguage();
     updateMenuUI();
 })();
