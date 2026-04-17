@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-25 -30 50 75" width="512" height="512">
+  <!-- Engine Flame -->
+  <polygon points="-10,25 10,25 0,42" fill="#ff9900" />
+  <polygon points="-5,25 5,25 0,35" fill="#ffcc00" />
+  
+  <!-- Main Body -->
+  <polygon points="0,-25 20,25 -20,25" fill="#00f5ff" />
+  
+  <!-- Cockpit -->
+  <polygon points="0,-12.5 10,12.5 -10,12.5" fill="#0088cc" />
+</svg>
