@@ -145,7 +145,11 @@ const translations = {
         ach_rich: "Zengin",
         ach_gold_desc: "5000 altın biriktir.",
         ach_survivor: "Kıdemli",
-        ach_wave_desc: "10. dalgaya ulaş."
+        ach_wave_desc: "10. dalgaya ulaş.",
+        
+        // Settings Extra
+        reset_progress: "İlerlemeyi Sıfırla",
+        confirm_reset: "Tüm ilerlemeniz silinecek. Emin misiniz?"
     },
     en: {
         title: "SPACE WAR",
@@ -288,7 +292,11 @@ const translations = {
         ach_rich: "Rich",
         ach_gold_desc: "Earn 5000 gold.",
         ach_survivor: "Veteran",
-        ach_wave_desc: "Reach wave 10."
+        ach_wave_desc: "Reach wave 10.",
+
+        // Settings Extra
+        reset_progress: "Reset Progress",
+        confirm_reset: "All your progress will be deleted. Are you sure?"
     },
     ru: {
         title: "КОСМИЧЕСКАЯ ВОЙНА",
@@ -431,7 +439,11 @@ const translations = {
         ach_rich: "Богач",
         ach_gold_desc: "Заработать 5000 золота.",
         ach_survivor: "Ветеран",
-        ach_wave_desc: "Дойти до 10-й волны."
+        ach_wave_desc: "Дойти до 10-й волны.",
+
+        // Settings Extra
+        reset_progress: "Сбросить прогресс",
+        confirm_reset: "Весь ваш прогресс будет удален. Вы уверены?"
     },
     ar: {
         title: "حرب الفضاء",
@@ -574,7 +586,11 @@ const translations = {
         ach_rich: "غني",
         ach_gold_desc: "اجمع 5000 ذهب.",
         ach_survivor: "مخضرم",
-        ach_wave_desc: "صل إلى الموجة 10."
+        ach_wave_desc: "صل إلى الموجة 10.",
+
+        // Settings Extra
+        reset_progress: "إعادة ضبط التقدم",
+        confirm_reset: "سيتم حذف كل تقدمك. هل أنت متأكد؟"
     },
     el: {
         title: "ΔΙΑΣΤΗΜΙΚΟΣ ΠΟΛΕΜΟΣ",
@@ -717,6 +733,10 @@ const translations = {
         ach_rich: "Πλούσιος",
         ach_gold_desc: "Κερδίστε 5000 χρυσό.",
         ach_survivor: "Βετεράνος",
-        ach_wave_desc: "Φτάστε στο κύμα 10."
+        ach_wave_desc: "Φτάστε στο κύμα 10.",
+
+        // Settings Extra
+        reset_progress: "Επαναφορά Προόδου",
+        confirm_reset: "Όλη η πρόοδός σας θα διαγραφεί. Είστε σίγουροι;"
     }
 };

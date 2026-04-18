@@ -2584,6 +2584,13 @@
         updateMenuUI();
     });
 
+    $('reset-progress-btn')?.addEventListener('click', () => {
+        if (confirm(t('confirm_reset'))) {
+            localStorage.removeItem('uzaySavasi_data');
+            location.reload();
+        }
+    });
+
     // Start with keyboard too
     window.addEventListener('keydown', e => {
         if (e.code === 'Enter' || e.code === 'Space') {
