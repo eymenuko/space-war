@@ -890,8 +890,8 @@
             get description() { return t('desc_potion'); },
             price: 100,
             effect: (game) => {
-                const ship = getSelectedShip();
-                game.player.hp = Math.min(ship.maxHP, game.player.hp + Math.floor(ship.maxHP * 0.25));
+                const p = game.player;
+                p.hp = Math.min(p.maxHP, p.hp + Math.floor(p.maxHP * 0.25));
                 showMessage(t('hp_restored'), '#ff2d55');
             }
         },
@@ -902,7 +902,7 @@
             get description() { return t('desc_crystal'); },
             price: 150,
             effect: (game) => {
-                game.player.energy = MAX_ENERGY;
+                game.player.energy = game.player.maxEnergy;
                 showMessage(t('energy_full'), '#00f5ff');
             }
         },
@@ -1013,8 +1013,8 @@
                 height: 50,
                 hp: ship.maxHP + (persistentData.upgrades.hp * 20),
                 maxHP: ship.maxHP + (persistentData.upgrades.hp * 20),
-                energy: 3 + (persistentData.upgrades.energy * 0.5),
-                maxEnergy: 3 + (persistentData.upgrades.energy * 0.5),
+                energy: 10 + (persistentData.upgrades.energy * 2),
+                maxEnergy: 10 + (persistentData.upgrades.energy * 2),
                 speed: ship.speed + (persistentData.upgrades.speed * 0.5),
                 damageBonus: persistentData.upgrades.damage * 2,
                 invincible: 0,
@@ -1798,7 +1798,7 @@
         p.x = Math.max(p.width / 2, Math.min(W - p.width / 2, p.x));
 
         // --- Energy Regen ---
-        p.energy = Math.min(MAX_ENERGY, p.energy + ship.energyGain);
+        p.energy = Math.min(p.maxEnergy, p.energy + ship.energyGain);
 
         // --- Shooting ---
         if (shootCooldown > 0) shootCooldown--;
