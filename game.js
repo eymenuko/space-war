@@ -314,94 +314,91 @@
             hpRating: 5,
             speedRating: 5,
             damageRating: 5,
-            fireShot: function (game, p) {
+            fireShot: function (game, p, damageMult = 1) {
                 AudioManager.playSound('star_hunter_shot');
+                const isCrit = damageMult > 1;
+                const finalDamage = Math.floor(this.shotDamage * damageMult);
+                
                 game.playerBullets.push({
                     x: p.x, y: p.y - p.height / 2,
                     vx: 0, vy: -this.shotSpeed,
-                    size: this.shotSize, damage: this.shotDamage,
+                    size: isCrit ? this.shotSize * 1.5 : this.shotSize,
+                    damage: finalDamage,
                     isSuper: false, life: 100, trail: [],
-                    color: this.color
+                    color: isCrit ? '#ff2d55' : (persistentData.customization.skin || this.color)
                 });
-                spawnParticles(p.x, p.y - p.height / 2, this.color, 5, 2);
+                if (isCrit) spawnDamageNumber(p.x, p.y - 40, "CRIT!", "#ff2d55");
+                spawnParticles(p.x, p.y - p.height / 2, isCrit ? '#ff2d55' : this.color, 5, 2);
             },
-            fireSuper: function (game, p) {
+            fireSuper: function (game, p, damageMult = 1) {
                 AudioManager.playSound('star_hunter_super');
+                const isCrit = damageMult > 1;
+                const finalDamage = Math.floor(this.superDamage * damageMult);
                 for (let angle = -0.15; angle <= 0.15; angle += 0.15) {
                     game.playerBullets.push({
                         x: p.x, y: p.y - p.height / 2,
                         vx: Math.sin(angle) * 8, vy: -10,
-                        size: 8, damage: this.superDamage,
+                        size: 8, damage: finalDamage,
                         isSuper: true, life: 120, trail: [],
-                        color: '#7b2ff7'
+                        color: isCrit ? '#ff2d55' : '#7b2ff7'
                     });
                 }
+                if (isCrit) spawnDamageNumber(p.x, p.y - 40, "CRIT!", "#ff2d55");
                 game.screenShake = 5;
                 game.shakeIntensity = 4;
                 spawnParticles(p.x, p.y - p.height / 2, '#7b2ff7', 15, 4);
             },
             drawShip: function (ctx, p) {
                 const thruster = Math.sin(p.thrusterPhase) * 0.3 + 0.7;
+                const shipColor = persistentData.customization.skin || p.color;
 
                 // Engine glow
+                const trailType = persistentData.customization.trail || 'flame';
+                let trailColor = '#ff9f00';
+                if (trailType === 'plasma') trailColor = '#00f5ff';
+                if (trailType === 'star') trailColor = '#fff';
+                if (trailType === 'void') trailColor = '#7b2ff7';
+
                 const engineGrad = ctx.createRadialGradient(0, p.height / 2 + 5, 0, 0, p.height / 2 + 5, 20 * thruster);
-                engineGrad.addColorStop(0, `rgba(0,200,255,${0.8 * thruster})`);
-                engineGrad.addColorStop(0.5, `rgba(123,47,247,${0.4 * thruster})`);
+                engineGrad.addColorStop(0, trailColor);
+                engineGrad.addColorStop(0.5, trailColor + '66');
                 engineGrad.addColorStop(1, 'transparent');
                 ctx.fillStyle = engineGrad;
                 ctx.fillRect(-20, p.height / 2 - 5, 40, 30);
 
-                // Thruster flame
-                ctx.beginPath();
-                ctx.moveTo(-8, p.height / 2);
-                ctx.lineTo(0, p.height / 2 + 15 + 10 * thruster);
-                ctx.lineTo(8, p.height / 2);
-                ctx.fillStyle = `rgba(0,245,255,${0.7 * thruster})`;
-                ctx.fill();
-
-                // Ship body
-                ctx.shadowColor = '#00f5ff';
+                // --- Ship Body ---
+                ctx.save();
                 ctx.shadowBlur = 15;
-
+                ctx.shadowColor = shipColor;
+                ctx.fillStyle = shipColor;
+                
+                // Main body
                 ctx.beginPath();
                 ctx.moveTo(0, -p.height / 2);
-                ctx.lineTo(-p.width / 2, p.height / 3);
-                ctx.lineTo(-p.width / 4, p.height / 2);
-                ctx.lineTo(p.width / 4, p.height / 2);
-                ctx.lineTo(p.width / 2, p.height / 3);
+                ctx.lineTo(p.width / 2, p.height / 2);
+                ctx.lineTo(-p.width / 2, p.height / 2);
                 ctx.closePath();
-
-                const shipGrad = ctx.createLinearGradient(0, -p.height / 2, 0, p.height / 2);
-                shipGrad.addColorStop(0, '#00d4ff');
-                shipGrad.addColorStop(0.5, '#0088cc');
-                shipGrad.addColorStop(1, '#004466');
-                ctx.fillStyle = shipGrad;
                 ctx.fill();
-                ctx.strokeStyle = '#00f5ff';
-                ctx.lineWidth = 1.5;
-                ctx.stroke();
 
                 // Cockpit
+                ctx.fillStyle = '#fff';
                 ctx.beginPath();
-                ctx.ellipse(0, -5, 6, 10, 0, 0, Math.PI * 2);
-                ctx.fillStyle = '#00f5ff';
-                ctx.globalAlpha = 0.6;
+                ctx.ellipse(0, -5, 8, 12, 0, 0, Math.PI * 2);
                 ctx.fill();
-                ctx.globalAlpha = 1;
 
-                // Wings
+                // Wings/Glow
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.moveTo(-p.width / 2, p.height / 3);
-                ctx.lineTo(-p.width / 2 - 8, p.height / 2 + 5);
-                ctx.lineTo(-p.width / 4, p.height / 2);
-                ctx.fillStyle = '#003355';
-                ctx.fill();
+                ctx.moveTo(-p.width / 2, 0);
+                ctx.lineTo(-p.width / 2 - 10, 15);
+                ctx.stroke();
                 ctx.beginPath();
-                ctx.moveTo(p.width / 2, p.height / 3);
-                ctx.lineTo(p.width / 2 + 8, p.height / 2 + 5);
-                ctx.lineTo(p.width / 4, p.height / 2);
-                ctx.fillStyle = '#003355';
-                ctx.fill();
+                ctx.moveTo(p.width / 2, 0);
+                ctx.lineTo(p.width / 2 + 10, 15);
+                ctx.stroke();
+
+                ctx.restore();
             }
         },
         {
@@ -438,7 +435,7 @@
                         vx: 0, vy: -this.shotSpeed,
                         size: this.shotSize, damage: this.shotDamage,
                         isSuper: false, life: 100, trail: [],
-                        color: this.color
+                        color: persistentData.customization.skin || this.color
                     });
                 }
                 spawnParticles(p.x, p.y - p.height / 2, this.color, 4, 2);
@@ -464,6 +461,7 @@
             },
             drawShip: function (ctx, p) {
                 const thruster = Math.sin(p.thrusterPhase) * 0.3 + 0.7;
+                const shipColor = persistentData.customization.skin || p.color;
 
                 // Dual engine glow
                 for (let dx = -10; dx <= 10; dx += 20) {
@@ -482,7 +480,7 @@
                     ctx.fill();
                 }
 
-                ctx.shadowColor = '#ff4444';
+                ctx.shadowColor = shipColor;
                 ctx.shadowBlur = 15;
 
                 // Sleek arrow body
@@ -497,12 +495,12 @@
                 ctx.closePath();
 
                 const grad = ctx.createLinearGradient(0, -p.height / 2, 0, p.height / 2);
-                grad.addColorStop(0, '#ff4444');
+                grad.addColorStop(0, shipColor);
                 grad.addColorStop(0.5, '#cc2200');
                 grad.addColorStop(1, '#661100');
                 ctx.fillStyle = grad;
                 ctx.fill();
-                ctx.strokeStyle = '#ff6644';
+                ctx.strokeStyle = shipColor;
                 ctx.lineWidth = 1.5;
                 ctx.stroke();
 
@@ -557,7 +555,7 @@
                     vx: 0, vy: -this.shotSpeed,
                     size: this.shotSize, damage: this.shotDamage,
                     isSuper: false, life: 120, trail: [],
-                    color: this.color
+                    color: persistentData.customization.skin || this.color
                 });
                 spawnParticles(p.x, p.y - p.height / 2, this.color, 6, 3);
             },
@@ -581,6 +579,7 @@
             },
             drawShip: function (ctx, p) {
                 const thruster = Math.sin(p.thrusterPhase) * 0.3 + 0.7;
+                const shipColor = persistentData.customization.skin || p.color;
 
                 // Engine glow
                 const eg = ctx.createRadialGradient(0, p.height / 2 + 5, 0, 0, p.height / 2 + 5, 22 * thruster);
@@ -597,7 +596,7 @@
                 ctx.fillStyle = `rgba(255,220,100,${0.7 * thruster})`;
                 ctx.fill();
 
-                ctx.shadowColor = '#ffd700';
+                ctx.shadowColor = shipColor;
                 ctx.shadowBlur = 18;
 
                 // Wide heavy body
@@ -612,12 +611,12 @@
                 ctx.closePath();
 
                 const grad = ctx.createLinearGradient(0, -p.height / 2, 0, p.height / 2);
-                grad.addColorStop(0, '#ffd700');
+                grad.addColorStop(0, shipColor);
                 grad.addColorStop(0.4, '#cc9900');
                 grad.addColorStop(1, '#664400');
                 ctx.fillStyle = grad;
                 ctx.fill();
-                ctx.strokeStyle = '#ffdd44';
+                ctx.strokeStyle = shipColor;
                 ctx.lineWidth = 2;
                 ctx.stroke();
 
@@ -626,7 +625,7 @@
                 ctx.arc(0, 0, 8, 0, Math.PI * 2);
                 ctx.fillStyle = 'rgba(255,255,255,0.15)';
                 ctx.fill();
-                ctx.strokeStyle = '#ffd700';
+                ctx.strokeStyle = shipColor;
                 ctx.lineWidth = 1.5;
                 ctx.stroke();
 
@@ -673,7 +672,7 @@
                         vx: 0, vy: -this.shotSpeed,
                         size: this.shotSize, damage: this.shotDamage,
                         isSuper: false, life: 80, trail: [],
-                        color: this.color
+                        color: persistentData.customization.skin || this.color
                     });
                 }
                 spawnParticles(p.x, p.y - p.height / 2, this.color, 3, 1.5);
@@ -691,6 +690,7 @@
             drawShip: function (ctx, p) {
                 const thruster = Math.sin(p.thrusterPhase) * 0.3 + 0.7;
                 const ghostAlpha = p.invincible > 0 ? 0.5 + Math.sin(p.thrusterPhase * 5) * 0.2 : 1;
+                const shipColor = persistentData.customization.skin || p.color;
 
                 ctx.globalAlpha = ghostAlpha;
 
@@ -708,7 +708,7 @@
                 ctx.fillStyle = `rgba(200,80,192,${0.6 * thruster})`;
                 ctx.fill();
 
-                ctx.shadowColor = '#c850c0';
+                ctx.shadowColor = shipColor;
                 ctx.shadowBlur = 12;
 
                 // Slim dagger shape
@@ -723,12 +723,12 @@
                 ctx.closePath();
 
                 const grad = ctx.createLinearGradient(0, -p.height / 2, 0, p.height / 2);
-                grad.addColorStop(0, '#c850c0');
+                grad.addColorStop(0, shipColor);
                 grad.addColorStop(0.5, '#9030a0');
                 grad.addColorStop(1, '#4a1060');
                 ctx.fillStyle = grad;
                 ctx.fill();
-                ctx.strokeStyle = '#dd70dd';
+                ctx.strokeStyle = shipColor;
                 ctx.lineWidth = 1;
                 ctx.stroke();
 
@@ -774,7 +774,7 @@
                     vx: 0, vy: -this.shotSpeed,
                     size: this.shotSize, damage: this.shotDamage,
                     isSuper: false, life: 100, trail: [],
-                    color: this.color
+                    color: persistentData.customization.skin || this.color
                 });
                 spawnParticles(p.x, p.y - p.height / 2, this.color, 7, 3);
             },
@@ -789,6 +789,7 @@
             },
             drawShip: function (ctx, p) {
                 const thruster = Math.sin(p.thrusterPhase) * 0.3 + 0.7;
+                const shipColor = persistentData.customization.skin || p.color;
 
                 // Engine glow
                 const eg = ctx.createRadialGradient(0, p.height / 2 + 5, 0, 0, p.height / 2 + 5, 20 * thruster);
@@ -805,7 +806,7 @@
                 ctx.fillStyle = `rgba(0,255,136,${0.7 * thruster})`;
                 ctx.fill();
 
-                ctx.shadowColor = '#00ff88';
+                ctx.shadowColor = shipColor;
                 ctx.shadowBlur = 18;
 
                 // Scale-like angular body
@@ -823,12 +824,12 @@
                 ctx.closePath();
 
                 const grad = ctx.createLinearGradient(0, -p.height / 2, 0, p.height / 2);
-                grad.addColorStop(0, '#00ff88');
+                grad.addColorStop(0, shipColor);
                 grad.addColorStop(0.5, '#00cc66');
                 grad.addColorStop(1, '#003311');
                 ctx.fillStyle = grad;
                 ctx.fill();
-                ctx.strokeStyle = '#55ffa5';
+                ctx.strokeStyle = shipColor;
                 ctx.lineWidth = 1.5;
                 ctx.stroke();
 
@@ -911,20 +912,28 @@
             get name() { return t('item_shield'); },
             emoji: '🛡️',
             get description() { return t('desc_shield'); },
-            price: 300,
+            price: 200,
             effect: (game) => {
-                if (game.player.energy >= 1) {
-                    game.player.energy -= 1;
-                    game.player.hasShield = true;
-                    game.player.shieldTimer = 300;
-                    AudioManager.playSound('powerup');
-                    showMessage(t('shield_active'), '#7b2ff7', 2000);
-                } else {
-                    showMessage(t('insufficient'), '#ff0000', 500);
-                }
+                game.player.hasShield = true;
+                game.player.shieldTimer = 600;
+                showMessage(t('shield_ready'), '#ffffff');
             }
         }
     ];
+
+    const DRONE_TYPES = [
+        { id: 'attack', name: 'drone_attack', color: '#ff2d55', icon: '⚔️' },
+        { id: 'support', name: 'drone_support', color: '#00f5ff', icon: '🔋' },
+        { id: 'defense', name: 'drone_defense', color: '#00ff88', icon: '🛡️' }
+    ];
+
+    const DRONE_TRAITS = {
+        attack: { id: 'crit', name: 'trait_crit', val: (lvl) => 5 + (lvl * 5) },
+        support: { id: 'recycle', name: 'trait_recycle', val: (lvl) => 0.1 + (lvl * 0.1) },
+        defense: { id: 'shield', name: 'trait_shield', val: (lvl) => 1 + (lvl * 0.5) }
+    };
+
+    const CRATE_COST = 500;
 
     // ===== PERSISTENT DATA (localStorage) =====
     let persistentData = {
@@ -938,7 +947,12 @@
         language: 'tr',
         upgrades: { hp: 0, speed: 0, damage: 0, energy: 0 },
         stats: { totalKills: 0, totalBosses: 0, totalGold: 0, maxWave: 0 },
-        unlockedAchievements: []
+        unlockedAchievements: [],
+        drones: [], // { id, type, trait, level }
+        customization: { 
+            skin: null, 
+            trail: 'flame' 
+        }
     };
 
     const ACHIEVEMENT_LIST = [
@@ -1310,20 +1324,27 @@
         const p = game.player;
         const ship = getSelectedShip();
 
+        // Drone: Critical Hit trait calculation
+        let damageMult = 1;
+        const attackDrone = persistentData.drones.find(d => d.type === 'attack');
+        if (attackDrone && Math.random() < DRONE_TRAITS.attack.val(attackDrone.level) / 100) {
+            damageMult = 2;
+        }
+
         if (isSuper) {
             if (p.energy < ship.superCost || superCooldown > 0) return;
             p.energy -= ship.superCost;
             superCooldown = ship.superCooldown;
-            ship.fireSuper(game, p);
+            ship.fireSuper(game, p, damageMult);
         } else {
             if (p.energy < ship.shotCost || shootCooldown > 0) return;
             p.energy -= ship.shotCost;
             shootCooldown = ship.shotCooldown;
-            ship.fireShot(game, p);
+            ship.fireShot(game, p, damageMult);
             
             // Double shot powerup
             if (p.doubleShot > 0) {
-                setTimeout(() => ship.fireShot(game, p), 100);
+                setTimeout(() => ship.fireShot(game, p, damageMult), 100);
             }
         }
     }
@@ -1772,6 +1793,230 @@
         });
     }
 
+    // ===== LOOT BOX SYSTEM =====
+    function openCrate() {
+        if (persistentData.totalCoins < CRATE_COST) {
+            AudioManager.playSound('hit');
+            showMessage(t('insufficient'), '#ff2d55');
+            return;
+        }
+
+        persistentData.totalCoins -= CRATE_COST;
+        saveData();
+        updateMenuUI();
+
+        const visual = $('crate-visual');
+        const result = $('crate-result');
+        const btn = $('open-crate-btn');
+
+        btn.disabled = true;
+        visual.classList.add('shaking');
+        AudioManager.playSound('btn_click');
+
+        setTimeout(() => {
+            visual.classList.remove('shaking');
+            visual.classList.add('opening');
+            
+            setTimeout(() => {
+                const droneType = DRONE_TYPES[Math.floor(Math.random() * DRONE_TYPES.length)];
+                const existing = persistentData.drones.find(d => d.type === droneType.id);
+                
+                if (existing) {
+                    existing.level++;
+                    showMessage(t('drone_upgraded'), droneType.color);
+                } else {
+                    persistentData.drones.push({
+                        type: droneType.id,
+                        level: 1
+                    });
+                    showMessage(t('new_drone_unlocked'), droneType.color);
+                }
+                
+                saveData();
+                visual.classList.remove('opening');
+                btn.disabled = false;
+                updateCrateUI();
+                renderCrateResult(droneType, existing ? existing.level : 1);
+            }, 1000);
+        }, 1500);
+    }
+
+    function renderCrateResult(type, level) {
+        const res = $('crate-result');
+        res.innerHTML = `
+            <div class="drone-card" style="border-color: ${type.color}">
+                <div class="drone-icon">${type.icon}</div>
+                <div>
+                    <div style="color: ${type.color}; font-weight: bold;">${t(type.name)}</div>
+                    <div style="font-size: 0.8rem; color: #aaa;">${t('level')} ${level}</div>
+                </div>
+            </div>
+        `;
+        res.classList.remove('hidden');
+    }
+
+    function updateCrateUI() {
+        const container = $('owned-drones');
+        container.innerHTML = '';
+        persistentData.drones.forEach(d => {
+            const type = DRONE_TYPES.find(t => t.id === d.type);
+            const card = document.createElement('div');
+            card.className = 'drone-card';
+            card.style.borderColor = type.color;
+            card.innerHTML = `
+                <div class="drone-icon">${type.icon}</div>
+                <div>
+                    <div style="color: ${type.color}">${t(type.name)}</div>
+                    <div style="font-size: 0.8rem">${t(DRONE_TRAITS[d.type].name).replace('%{val}', DRONE_TRAITS[d.type].val(d.level))}</div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    // ===== CUSTOMIZATION SYSTEM =====
+    function renderCustomizeUI() {
+        const skins = ['#00f5ff', '#ff2d55', '#ff9f00', '#00ff88', '#7b2ff7', '#ffffff'];
+        const trails = [
+            { id: 'flame', name: 'trail_flame', color: '#ff9f00' },
+            { id: 'plasma', name: 'trail_plasma', color: '#00f5ff' },
+            { id: 'star', name: 'trail_star', color: '#fff' },
+            { id: 'void', name: 'trail_void', color: '#7b2ff7' }
+        ];
+
+        const skinList = $('skin-list');
+        skinList.innerHTML = '';
+        skins.forEach(color => {
+            const btn = document.createElement('div');
+            btn.className = `color-btn ${persistentData.customization.skin === color ? 'active' : ''}`;
+            btn.innerHTML = `<div class="color-inner" style="background: ${color}"></div>`;
+            btn.onclick = () => {
+                persistentData.customization.skin = color;
+                saveData();
+                renderCustomizeUI();
+            };
+            skinList.appendChild(btn);
+        });
+
+        const trailList = $('trail-list');
+        trailList.innerHTML = '';
+        trails.forEach(tData => {
+            const btn = document.createElement('div');
+            btn.className = `trail-btn ${persistentData.customization.trail === tData.id ? 'active' : ''}`;
+            btn.style.color = tData.color;
+            btn.innerHTML = `<span>${t(tData.name)}</span>`;
+            btn.onclick = () => {
+                persistentData.customization.trail = tData.id;
+                saveData();
+                renderCustomizeUI();
+            };
+            trailList.appendChild(btn);
+        });
+    }
+
+    // ===== ENVIRONMENTAL EVENTS =====
+    const EventManager = {
+        active: null,
+        timer: 0,
+        objects: [],
+        
+        update(game, p) {
+            if (!this.active) {
+                if (game.wave > 2 && Math.random() < 0.002) {
+                    this.startRandomEvent();
+                }
+                return;
+            }
+
+            this.timer--;
+            if (this.timer <= 0) this.stopEvent();
+
+            if (this.active === 'meteor') this.updateMeteors(p);
+            if (this.active === 'blackhole') this.updateBlackHole(p);
+        },
+
+        startRandomEvent() {
+            const events = ['meteor', 'nebula', 'blackhole'];
+            this.active = events[Math.floor(Math.random() * events.length)];
+            this.timer = 600 + Math.random() * 600;
+            
+            if (this.active === 'nebula') document.body.classList.add('nebula-active');
+            showMessage(t('event_' + this.active), '#ffaa00', 3000);
+            AudioManager.playSound('powerup');
+        },
+
+        stopEvent() {
+            document.body.classList.remove('nebula-active');
+            this.active = null;
+            this.objects = [];
+        },
+
+        updateMeteors(p) {
+            if (Math.random() < 0.1) {
+                this.objects.push({
+                    x: Math.random() * canvas.width,
+                    y: -50,
+                    size: 20 + Math.random() * 40,
+                    speed: 3 + Math.random() * 5,
+                    rot: 0,
+                    rotV: (Math.random() - 0.5) * 0.1
+                });
+            }
+            this.objects.forEach(m => {
+                m.y += m.speed;
+                m.rot += m.rotV;
+                if (circlesCollide(m, p, m.size * 0.8, 30)) {
+                    p.hp -= 5;
+                    m.y = 10000; // Remove
+                }
+            });
+            this.objects = this.objects.filter(m => m.y < canvas.height + 100);
+        },
+
+        updateBlackHole(p) {
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            const dx = cx - p.x;
+            const dy = cy - p.y;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            if (dist > 50) {
+                p.x += (dx / dist) * 1.5;
+                p.y += (dy / dist) * 1.5;
+            }
+        },
+
+        draw(ctx) {
+            if (this.active === 'meteor') {
+                this.objects.forEach(m => {
+                    ctx.save();
+                    ctx.translate(m.x, m.y);
+                    ctx.rotate(m.rot);
+                    ctx.fillStyle = '#555';
+                    ctx.beginPath();
+                    ctx.moveTo(0, -m.size);
+                    for(let i=0; i<6; i++) {
+                        const r = i%2===0 ? m.size : m.size*0.8;
+                        ctx.lineTo(Math.cos(i*Math.PI/3)*r, Math.sin(i*Math.PI/3)*r);
+                    }
+                    ctx.fill();
+                    ctx.restore();
+                });
+            }
+            if (this.active === 'blackhole') {
+                ctx.save();
+                ctx.beginPath();
+                const grad = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, 100);
+                grad.addColorStop(0, '#000');
+                grad.addColorStop(0.8, '#7b2ff7');
+                grad.addColorStop(1, 'transparent');
+                ctx.fillStyle = grad;
+                ctx.arc(canvas.width/2, canvas.height/2, 100, 0, Math.PI*2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+    };
+
     function updateCoinDisplay() {
         hud.coins.textContent = game.coins;
         hud.merchantCoins.textContent = game.coins;
@@ -2000,7 +2245,51 @@
             if (game.comboTimer <= 0) game.combo = 0;
         }
 
+        // --- Drones ---
+        updateDrones(p);
+        
+        // --- Events ---
+        EventManager.update(game, p);
+
         updateHUD();
+    }
+
+    let droneOrbit = 0;
+    function updateDrones(p) {
+        droneOrbit += 0.05;
+        
+        // Drone: Emergency Shield trait
+        const defenseDrone = persistentData.drones.find(d => d.type === 'defense');
+        if (defenseDrone && p.hp < p.maxHP * 0.2 && !p.hasShield && !p._droneShieldCooldown) {
+            p.hasShield = true;
+            p.shieldTimer = 300 * DRONE_TRAITS.defense.val(defenseDrone.level);
+            p._droneShieldCooldown = 1800; // 30 sec
+            showMessage(t('trait_shield'), DRONE_TYPES.find(t=>t.id==='defense').color);
+        }
+        if (p._droneShieldCooldown > 0) p._droneShieldCooldown--;
+    }
+
+    function drawDrones(ctx, p) {
+        persistentData.drones.forEach((d, i) => {
+            const type = DRONE_TYPES.find(t => t.id === d.type);
+            const angle = droneOrbit + (i * Math.PI * 2 / persistentData.drones.length);
+            const dx = p.x + Math.cos(angle) * 60;
+            const dy = p.y + Math.sin(angle) * 60;
+
+            ctx.save();
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = type.color;
+            ctx.fillStyle = type.color;
+            ctx.beginPath();
+            ctx.arc(dx, dy, 6, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = '#fff';
+            ctx.font = '10px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(type.icon, dx, dy + 4);
+            ctx.restore();
+        });
     }
 
     // ===== BOSS DEFEATED =====
@@ -2024,6 +2313,14 @@
             maxHP: b.maxHP,
             value: headValue
         });
+
+        // Drone: Energy Recycle trait
+        const supportDrone = persistentData.drones.find(d => d.type === 'support');
+        if (supportDrone) {
+            const recycleVal = DRONE_TRAITS.support.val(supportDrone.level);
+            p.energy = Math.min(p.maxEnergy, p.energy + recycleVal);
+            showMessage(`${t('trait_recycle')} +${recycleVal.toFixed(1)}`, DRONE_TYPES.find(t=>t.id==='support').color);
+        }
 
         game.wave++;
         p.energy = Math.min(p.maxEnergy, p.energy + 3);
@@ -2122,6 +2419,12 @@
             ctx.fillStyle = grad;
             ctx.fillRect(e.x - radius, e.y - radius, radius * 2, radius * 2);
         });
+
+        // --- Events ---
+        EventManager.draw(ctx);
+
+        // --- Drones ---
+        drawDrones(ctx, p);
 
         // --- Boss ---
         const b = game.boss;
@@ -2538,6 +2841,22 @@
     $('lab-back-btn').addEventListener('click', () => { AudioManager.playSound('btn_click'); goToMenu(); });
     $('achievements-btn').addEventListener('click', () => { AudioManager.playSound('btn_click'); openAchievements(); });
     $('achievements-back-btn').addEventListener('click', () => { AudioManager.playSound('btn_click'); goToMenu(); });
+    
+    $('crate-btn').addEventListener('click', () => { 
+        AudioManager.playSound('btn_click'); 
+        showScreen('crate'); 
+        updateCrateUI(); 
+    });
+    $('crate-back-btn').addEventListener('click', () => { AudioManager.playSound('btn_click'); goToMenu(); });
+    $('open-crate-btn').addEventListener('click', () => { openCrate(); });
+
+    $('customize-btn').addEventListener('click', () => { 
+        AudioManager.playSound('btn_click'); 
+        showScreen('customize'); 
+        renderCustomizeUI(); 
+    });
+    $('customize-back-btn').addEventListener('click', () => { AudioManager.playSound('btn_click'); goToMenu(); });
+
     $('merchant-close-btn').addEventListener('click', () => { AudioManager.playSound('btn_click'); closeMerchant(); });
 
     function updateSettingsUI() {
