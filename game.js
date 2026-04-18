@@ -2584,12 +2584,16 @@
         updateMenuUI();
     });
 
-    $('reset-progress-btn')?.addEventListener('click', () => {
-        if (confirm(t('confirm_reset'))) {
-            localStorage.removeItem('uzaySavasi_data');
-            location.reload();
-        }
-    });
+    const resetBtn = $('reset-progress-btn');
+    if (resetBtn) {
+        resetBtn.onclick = () => {
+            const msg = t('confirm_reset') || "Sıfırlansın mı?";
+            if (window.confirm(msg)) {
+                localStorage.removeItem('uzaySavasi_data');
+                window.location.reload();
+            }
+        };
+    }
 
     // Start with keyboard too
     window.addEventListener('keydown', e => {
