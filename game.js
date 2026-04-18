@@ -981,6 +981,8 @@
                 if (!persistentData.upgrades) persistentData.upgrades = { hp: 0, speed: 0, damage: 0, energy: 0 };
                 if (!persistentData.stats) persistentData.stats = { totalKills: 0, totalBosses: 0, totalGold: 0, maxWave: 0 };
                 if (!persistentData.unlockedAchievements) persistentData.unlockedAchievements = [];
+                if (!persistentData.drones) persistentData.drones = [];
+                if (!persistentData.customization) persistentData.customization = { skin: null, trail: 'flame' };
             }
         } catch (e) { /* ignore */ }
     }
@@ -1039,7 +1041,8 @@
                 beamMode: 0,
                 doubleShot: 0,
                 timeSlow: 0,
-                magnet: 0
+                magnet: 0,
+                color: ship.color
             },
 
             boss: null,
@@ -2505,6 +2508,7 @@
 
     // ===== HELPER: hex to rgba =====
     function hexToRgba(hex, alpha) {
+        if (!hex || typeof hex !== 'string' || !hex.startsWith('#')) return `rgba(255,255,255,${alpha})`;
         const r = parseInt(hex.slice(1, 3), 16);
         const g = parseInt(hex.slice(3, 5), 16);
         const b = parseInt(hex.slice(5, 7), 16);
