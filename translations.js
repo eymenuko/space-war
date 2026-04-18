@@ -149,27 +149,7 @@ const translations = {
         
         // Settings Extra
         reset_progress: "İlerlemeyi Sıfırla",
-        confirm_reset: "Tüm ilerlemeniz silinecek. Emin misiniz?",
-
-        // Expansion: Drones & Boxes
-        loot_box: "ŞANS KUTUSU",
-        open_crate: "KUTU AÇ",
-        crate_cost_text: "500 Altın",
-        drone_attack: "SALDIRI DRONU",
-        drone_support: "DESTEK DRONU",
-        drone_defense: "SAVUNMA DRONU",
-        trait_crit: "Kritik Vuruş (%{val} Şans)",
-        trait_recycle: "Enerji Geri Kazanımı",
-        trait_shield: "Acil Durum Kalkanı",
-        new_drone_unlocked: "YENİ DRONE AÇILDI!",
-        drone_upgraded: "DRONE SEVİYE ATLADI!",
-
-        // Expansion: Events
-        event_meteor: "⚠️ METEOR YAĞMURU!",
-        event_nebula: "🌌 KOZMİK NEBULA!",
-        event_blackhole: "🌀 KARA DELİK ÇEKİMİ!",
-
-
+        confirm_reset: "Tüm ilerlemeniz silinecek. Emin misiniz?"
     },
     en: {
         title: "SPACE WAR",
@@ -316,25 +296,7 @@ const translations = {
 
         // Settings Extra
         reset_progress: "Reset Progress",
-        confirm_reset: "All your progress will be deleted. Are you sure?",
-
-        // Expansion: Drones & Boxes
-        loot_box: "LOOT BOX",
-        open_crate: "OPEN CRATE",
-        crate_cost_text: "500 Gold",
-        drone_attack: "ATTACK DRONE",
-        drone_support: "SUPPORT DRONE",
-        drone_defense: "DEFENSE DRONE",
-        trait_crit: "Critical Hit (%{val} Chance)",
-        trait_recycle: "Energy Recycle",
-        trait_shield: "Emergency Shield",
-        new_drone_unlocked: "NEW DRONE UNLOCKED!",
-        drone_upgraded: "DRONE UPGRADED!",
-
-        // Expansion: Events
-        event_meteor: "⚠️ METEOR SHOWER!",
-        event_nebula: "🌌 COSMIC NEBULA!",
-        event_blackhole: "🌀 BLACK HOLE PULL!",
+        confirm_reset: "All your progress will be deleted. Are you sure?"
     },
     ru: {
         title: "КОСМИЧЕСКАЯ ВОЙНА",
@@ -481,34 +443,7 @@ const translations = {
 
         // Settings Extra
         reset_progress: "Сбросить прогресс",
-        confirm_reset: "Весь ваш прогресс будет удален. Вы уверены?",
-
-        // Expansion: Drones & Boxes
-        loot_box: "ЯЩИК С ДОБЫЧЕЙ",
-        open_crate: "ОТКРЫТЬ ЯЩИК",
-        crate_cost_text: "500 Золота",
-        drone_attack: "АТАКУЮЩИЙ ДРОН",
-        drone_support: "ДРОН ПОДДЕРЖКИ",
-        drone_defense: "ЗАЩИТНЫЙ ДРОН",
-        trait_crit: "Крит. удар (%{val} Шанс)",
-        trait_recycle: "Регенерация энергии",
-        trait_shield: "Аварийный щит",
-        new_drone_unlocked: "НОВЫЙ ДРОН РАЗБЛОКИРОВАН!",
-        drone_upgraded: "ДРОН УЛУЧШЕН!",
-
-        // Expansion: Events
-        event_meteor: "⚠️ МЕТЕОРИТНЫЙ ДОЖДЬ!",
-        event_nebula: "🌌 КОСМИЧЕСКАЯ ТУМАННОСТЬ!",
-        event_blackhole: "🌀 ТЯГА ЧЕРНОЙ ДЫРЫ!",
-
-        // Expansion: Customization
-        customize: "ЦВЕТ И СЛЕД",
-        skin_color: "ЦВЕТ КОРПУСА",
-        engine_trail: "СЛЕД ДВИГАТЕЛЯ",
-        trail_flame: "Классическое пламя",
-        trail_plasma: "Синяя плазма",
-        trail_star: "Звездная пыль",
-        trail_void: "Темная пустота"
+        confirm_reset: "Весь ваш прогресс будет удален. Вы уверены?"
     },
     ar: {
         title: "حرب الفضاء",
@@ -655,34 +590,7 @@ const translations = {
 
         // Settings Extra
         reset_progress: "إعادة ضبط التقدم",
-        confirm_reset: "سيتم حذف كل تقدمك. هل أنت متأكد؟",
-
-        // Expansion: Drones & Boxes
-        loot_box: "صندوق الحظ",
-        open_crate: "افتح الصندوق",
-        crate_cost_text: "500 ذهب",
-        drone_attack: "طائرة هجومية",
-        drone_support: "طائرة دعم",
-        drone_defense: "طائرة دفاعية",
-        trait_crit: "ضربة قاضية (فرصة %{val})",
-        trait_recycle: "إعادة تدوير الطاقة",
-        trait_shield: "درع الطوارئ",
-        new_drone_unlocked: "تم فتح طائرة جديدة!",
-        drone_upgraded: "تم ترقية الطائرة!",
-
-        // Expansion: Events
-        event_meteor: "⚠️ زخات شهب!",
-        event_nebula: "🌌 سديم كوني!",
-        event_blackhole: "🌀 سحب الثقب الأسود!",
-
-        // Expansion: Customization
-        customize: "الطلاء والأثر",
-        skin_color: "لون الهيكل",
-        engine_trail: "أثر المحرك",
-        trail_flame: "لهب كلاسيكي",
-        trail_plasma: "بلازما زرقاء",
-        trail_star: "غبار النجوم",
-        trail_void: "الفراغ المظلم"
+        confirm_reset: "سيتم حذف كل تقدمك. هل أنت متأكد؟"
     },
     el: {
         title: "ΔΙΑΣΤΗΜΙΚΟΣ ΠΟΛΕΜΟΣ",
@@ -829,26 +737,6 @@ const translations = {
 
         // Settings Extra
         reset_progress: "Επαναφορά Προόδου",
-        confirm_reset: "Όλη η πρόοδός σας θα διαγραφεί. Είστε σίγουροι;",
-
-        // Expansion: Drones & Boxes
-        loot_box: "ΚΟΥΤΙ ΤΥΧΗΣ",
-        open_crate: "ΑΝΟΙΓΜΑ ΚΟΥΤΙΟΥ",
-        crate_cost_text: "500 Χρυσός",
-        drone_attack: "DRONE ΕΠΙΘΕΣΗΣ",
-        drone_support: "DRONE ΥΠΟΣΤΗΡΙΞΗΣ",
-        drone_defense: "DRONE ΑΜΥΝΑΣ",
-        trait_crit: "Κρίσιμο Χτύπημα (%{val} Πιθανότητα)",
-        trait_recycle: "Ανακύκλωση Ενέργειας",
-        trait_shield: "Ασπίδα Έκτακτης Ανάγκης",
-        new_drone_unlocked: "ΝΕΟ DRONE ΞΕΚΛΕΙΔΩΘΗΚΕ!",
-        drone_upgraded: "DRONE ΑΝΑΒΑΘΜΙΣΤΗΚΕ!",
-
-        // Expansion: Events
-        event_meteor: "⚠️ ΒΡΟΧΗ ΜΕΤΕΩΡΙΤΩΝ!",
-        event_nebula: "🌌 ΚΟΣΜΙΚΟ ΝΕΦΕΛΩΜΑ!",
-        event_blackhole: "🌀 ΕΛΞΗ ΜΑΥΡΗΣ ΤΡΥΠΑΣ!",
-
-
+        confirm_reset: "Όλη η πρόοδός σας θα διαγραφεί. Είστε σίγουροι;"
     }
 };

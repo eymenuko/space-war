@@ -14,8 +14,7 @@
         over: $('gameover-screen'),
         settings: $('settings-screen'),
         lab: $('lab-screen'),
-        achievements: $('achievements-screen'),
-        crate: $('crate-screen')
+        achievements: $('achievements-screen')
     };
 
     const hud = {
@@ -315,85 +314,94 @@
             hpRating: 5,
             speedRating: 5,
             damageRating: 5,
-            fireShot: function (game, p, damageMult = 1) {
+            fireShot: function (game, p) {
                 AudioManager.playSound('star_hunter_shot');
-                const isCrit = damageMult > 1;
-                const finalDamage = Math.floor(this.shotDamage * damageMult);
-                
                 game.playerBullets.push({
                     x: p.x, y: p.y - p.height / 2,
                     vx: 0, vy: -this.shotSpeed,
-                    size: isCrit ? this.shotSize * 1.5 : this.shotSize,
-                    damage: finalDamage,
+                    size: this.shotSize, damage: this.shotDamage,
                     isSuper: false, life: 100, trail: [],
-                    color: isCrit ? '#ff2d55' : this.color
+                    color: this.color
                 });
-                if (isCrit) spawnDamageNumber(p.x, p.y - 40, "CRIT!", "#ff2d55");
-                spawnParticles(p.x, p.y - p.height / 2, isCrit ? '#ff2d55' : this.color, 5, 2);
+                spawnParticles(p.x, p.y - p.height / 2, this.color, 5, 2);
             },
-            fireSuper: function (game, p, damageMult = 1) {
+            fireSuper: function (game, p) {
                 AudioManager.playSound('star_hunter_super');
-                const isCrit = damageMult > 1;
-                const finalDamage = Math.floor(this.superDamage * damageMult);
                 for (let angle = -0.15; angle <= 0.15; angle += 0.15) {
                     game.playerBullets.push({
                         x: p.x, y: p.y - p.height / 2,
                         vx: Math.sin(angle) * 8, vy: -10,
-                        size: 8, damage: finalDamage,
+                        size: 8, damage: this.superDamage,
                         isSuper: true, life: 120, trail: [],
-                        color: isCrit ? '#ff2d55' : '#7b2ff7'
+                        color: '#7b2ff7'
                     });
                 }
-                if (isCrit) spawnDamageNumber(p.x, p.y - 40, "CRIT!", "#ff2d55");
                 game.screenShake = 5;
                 game.shakeIntensity = 4;
                 spawnParticles(p.x, p.y - p.height / 2, '#7b2ff7', 15, 4);
             },
             drawShip: function (ctx, p) {
                 const thruster = Math.sin(p.thrusterPhase) * 0.3 + 0.7;
-                const shipColor = this.color;
 
                 // Engine glow
                 const engineGrad = ctx.createRadialGradient(0, p.height / 2 + 5, 0, 0, p.height / 2 + 5, 20 * thruster);
-                engineGrad.addColorStop(0, '#ff9f00');
-                engineGrad.addColorStop(0.5, 'rgba(255,160,0,0.4)');
+                engineGrad.addColorStop(0, `rgba(0,200,255,${0.8 * thruster})`);
+                engineGrad.addColorStop(0.5, `rgba(123,47,247,${0.4 * thruster})`);
                 engineGrad.addColorStop(1, 'transparent');
                 ctx.fillStyle = engineGrad;
                 ctx.fillRect(-20, p.height / 2 - 5, 40, 30);
 
-                // --- Ship Body ---
-                ctx.save();
+                // Thruster flame
+                ctx.beginPath();
+                ctx.moveTo(-8, p.height / 2);
+                ctx.lineTo(0, p.height / 2 + 15 + 10 * thruster);
+                ctx.lineTo(8, p.height / 2);
+                ctx.fillStyle = `rgba(0,245,255,${0.7 * thruster})`;
+                ctx.fill();
+
+                // Ship body
+                ctx.shadowColor = '#00f5ff';
                 ctx.shadowBlur = 15;
-                ctx.shadowColor = shipColor;
-                ctx.fillStyle = shipColor;
-                
-                // Main body
+
                 ctx.beginPath();
                 ctx.moveTo(0, -p.height / 2);
-                ctx.lineTo(p.width / 2, p.height / 2);
-                ctx.lineTo(-p.width / 2, p.height / 2);
+                ctx.lineTo(-p.width / 2, p.height / 3);
+                ctx.lineTo(-p.width / 4, p.height / 2);
+                ctx.lineTo(p.width / 4, p.height / 2);
+                ctx.lineTo(p.width / 2, p.height / 3);
                 ctx.closePath();
+
+                const shipGrad = ctx.createLinearGradient(0, -p.height / 2, 0, p.height / 2);
+                shipGrad.addColorStop(0, '#00d4ff');
+                shipGrad.addColorStop(0.5, '#0088cc');
+                shipGrad.addColorStop(1, '#004466');
+                ctx.fillStyle = shipGrad;
                 ctx.fill();
+                ctx.strokeStyle = '#00f5ff';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
 
                 // Cockpit
-                ctx.fillStyle = '#fff';
                 ctx.beginPath();
-                ctx.ellipse(0, -5, 8, 12, 0, 0, Math.PI * 2);
+                ctx.ellipse(0, -5, 6, 10, 0, 0, Math.PI * 2);
+                ctx.fillStyle = '#00f5ff';
+                ctx.globalAlpha = 0.6;
                 ctx.fill();
+                ctx.globalAlpha = 1;
 
-                // Wings/Glow
-                ctx.strokeStyle = '#fff';
-                ctx.lineWidth = 2;
+                // Wings
                 ctx.beginPath();
-                ctx.moveTo(-p.width / 2, 0);
-                ctx.lineTo(-p.width / 2 - 10, 15);
-                ctx.stroke();
+                ctx.moveTo(-p.width / 2, p.height / 3);
+                ctx.lineTo(-p.width / 2 - 8, p.height / 2 + 5);
+                ctx.lineTo(-p.width / 4, p.height / 2);
+                ctx.fillStyle = '#003355';
+                ctx.fill();
                 ctx.beginPath();
-                ctx.moveTo(p.width / 2, 0);
-                ctx.lineTo(p.width / 2 + 10, 15);
-                ctx.stroke();
-
-                ctx.restore();
+                ctx.moveTo(p.width / 2, p.height / 3);
+                ctx.lineTo(p.width / 2 + 8, p.height / 2 + 5);
+                ctx.lineTo(p.width / 4, p.height / 2);
+                ctx.fillStyle = '#003355';
+                ctx.fill();
             }
         },
         {
@@ -422,27 +430,21 @@
             hpRating: 3,
             speedRating: 8,
             damageRating: 6,
-            fireShot: function (game, p, damageMult = 1) {
+            fireShot: function (game, p) {
                 AudioManager.playSound('red_hawk_shot');
-                const isCrit = damageMult > 1;
-                const finalDamage = Math.floor(this.shotDamage * damageMult);
                 for (let dx = -8; dx <= 8; dx += 16) {
                     game.playerBullets.push({
                         x: p.x + dx, y: p.y - p.height / 2,
                         vx: 0, vy: -this.shotSpeed,
-                        size: isCrit ? this.shotSize * 1.5 : this.shotSize,
-                        damage: finalDamage,
+                        size: this.shotSize, damage: this.shotDamage,
                         isSuper: false, life: 100, trail: [],
-                        color: isCrit ? '#ff2d55' : this.color
+                        color: this.color
                     });
                 }
-                if (isCrit) spawnDamageNumber(p.x, p.y - 40, "CRIT!", "#ff2d55");
                 spawnParticles(p.x, p.y - p.height / 2, this.color, 4, 2);
             },
-            fireSuper: function (game, p, damageMult = 1) {
+            fireSuper: function (game, p) {
                 AudioManager.playSound('red_hawk_super');
-                const isCrit = damageMult > 1;
-                const finalDamage = Math.floor(this.superDamage * damageMult);
                 for (let i = 0; i < 8; i++) {
                     const spread = (i - 3.5) * 0.12;
                     game.playerBullets.push({
@@ -451,19 +453,17 @@
                         vx: Math.sin(spread) * 6,
                         vy: -12 - Math.random() * 3,
                         size: 6,
-                        damage: finalDamage,
+                        damage: this.superDamage,
                         isSuper: true, life: 100, trail: [],
-                        color: isCrit ? '#ff2d55' : '#ff6b35'
+                        color: '#ff6b35'
                     });
                 }
-                if (isCrit) spawnDamageNumber(p.x, p.y - 40, "CRIT!", "#ff2d55");
                 game.screenShake = 8;
                 game.shakeIntensity = 6;
                 spawnParticles(p.x, p.y - p.height / 2, '#ff6b35', 20, 5);
             },
             drawShip: function (ctx, p) {
                 const thruster = Math.sin(p.thrusterPhase) * 0.3 + 0.7;
-                const shipColor = this.color;
 
                 // Dual engine glow
                 for (let dx = -10; dx <= 10; dx += 20) {
@@ -482,7 +482,7 @@
                     ctx.fill();
                 }
 
-                ctx.shadowColor = shipColor;
+                ctx.shadowColor = '#ff4444';
                 ctx.shadowBlur = 15;
 
                 // Sleek arrow body
@@ -497,12 +497,12 @@
                 ctx.closePath();
 
                 const grad = ctx.createLinearGradient(0, -p.height / 2, 0, p.height / 2);
-                grad.addColorStop(0, shipColor);
+                grad.addColorStop(0, '#ff4444');
                 grad.addColorStop(0.5, '#cc2200');
                 grad.addColorStop(1, '#661100');
                 ctx.fillStyle = grad;
                 ctx.fill();
-                ctx.strokeStyle = shipColor;
+                ctx.strokeStyle = '#ff6644';
                 ctx.lineWidth = 1.5;
                 ctx.stroke();
 
@@ -550,19 +550,15 @@
             hpRating: 9,
             speedRating: 3,
             damageRating: 7,
-            fireShot: function (game, p, damageMult = 1) {
+            fireShot: function (game, p) {
                 AudioManager.playSound('titan_shield_shot');
-                const isCrit = damageMult > 1;
-                const finalDamage = Math.floor(this.shotDamage * damageMult);
                 game.playerBullets.push({
                     x: p.x, y: p.y - p.height / 2,
                     vx: 0, vy: -this.shotSpeed,
-                    size: isCrit ? this.shotSize * 1.5 : this.shotSize,
-                    damage: finalDamage,
+                    size: this.shotSize, damage: this.shotDamage,
                     isSuper: false, life: 120, trail: [],
-                    color: isCrit ? '#ff2d55' : this.color
+                    color: this.color
                 });
-                if (isCrit) spawnDamageNumber(p.x, p.y - 40, "CRIT!", "#ff2d55");
                 spawnParticles(p.x, p.y - p.height / 2, this.color, 6, 3);
             },
             fireSuper: function (game, p) {
@@ -585,7 +581,6 @@
             },
             drawShip: function (ctx, p) {
                 const thruster = Math.sin(p.thrusterPhase) * 0.3 + 0.7;
-                const shipColor = this.color;
 
                 // Engine glow
                 const eg = ctx.createRadialGradient(0, p.height / 2 + 5, 0, 0, p.height / 2 + 5, 22 * thruster);
@@ -602,7 +597,7 @@
                 ctx.fillStyle = `rgba(255,220,100,${0.7 * thruster})`;
                 ctx.fill();
 
-                ctx.shadowColor = shipColor;
+                ctx.shadowColor = '#ffd700';
                 ctx.shadowBlur = 18;
 
                 // Wide heavy body
@@ -617,12 +612,12 @@
                 ctx.closePath();
 
                 const grad = ctx.createLinearGradient(0, -p.height / 2, 0, p.height / 2);
-                grad.addColorStop(0, shipColor);
+                grad.addColorStop(0, '#ffd700');
                 grad.addColorStop(0.4, '#cc9900');
                 grad.addColorStop(1, '#664400');
                 ctx.fillStyle = grad;
                 ctx.fill();
-                ctx.strokeStyle = shipColor;
+                ctx.strokeStyle = '#ffdd44';
                 ctx.lineWidth = 2;
                 ctx.stroke();
 
@@ -631,7 +626,7 @@
                 ctx.arc(0, 0, 8, 0, Math.PI * 2);
                 ctx.fillStyle = 'rgba(255,255,255,0.15)';
                 ctx.fill();
-                ctx.strokeStyle = shipColor;
+                ctx.strokeStyle = '#ffd700';
                 ctx.lineWidth = 1.5;
                 ctx.stroke();
 
@@ -670,21 +665,17 @@
             hpRating: 2,
             speedRating: 10,
             damageRating: 4,
-            fireShot: function (game, p, damageMult = 1) {
+            fireShot: function (game, p) {
                 AudioManager.playSound('ghost_blade_shot');
-                const isCrit = damageMult > 1;
-                const finalDamage = Math.floor(this.shotDamage * damageMult);
                 for (let dx = -6; dx <= 6; dx += 12) {
                     game.playerBullets.push({
                         x: p.x + dx, y: p.y - p.height / 2,
                         vx: 0, vy: -this.shotSpeed,
-                        size: isCrit ? this.shotSize * 1.5 : this.shotSize,
-                        damage: finalDamage,
+                        size: this.shotSize, damage: this.shotDamage,
                         isSuper: false, life: 80, trail: [],
-                        color: isCrit ? '#ff2d55' : this.color
+                        color: this.color
                     });
                 }
-                if (isCrit) spawnDamageNumber(p.x, p.y - 40, "CRIT!", "#ff2d55");
                 spawnParticles(p.x, p.y - p.height / 2, this.color, 3, 1.5);
             },
             fireSuper: function (game, p) {
@@ -700,7 +691,6 @@
             drawShip: function (ctx, p) {
                 const thruster = Math.sin(p.thrusterPhase) * 0.3 + 0.7;
                 const ghostAlpha = p.invincible > 0 ? 0.5 + Math.sin(p.thrusterPhase * 5) * 0.2 : 1;
-                const shipColor = this.color;
 
                 ctx.globalAlpha = ghostAlpha;
 
@@ -718,7 +708,7 @@
                 ctx.fillStyle = `rgba(200,80,192,${0.6 * thruster})`;
                 ctx.fill();
 
-                ctx.shadowColor = shipColor;
+                ctx.shadowColor = '#c850c0';
                 ctx.shadowBlur = 12;
 
                 // Slim dagger shape
@@ -733,12 +723,12 @@
                 ctx.closePath();
 
                 const grad = ctx.createLinearGradient(0, -p.height / 2, 0, p.height / 2);
-                grad.addColorStop(0, shipColor);
+                grad.addColorStop(0, '#c850c0');
                 grad.addColorStop(0.5, '#9030a0');
                 grad.addColorStop(1, '#4a1060');
                 ctx.fillStyle = grad;
                 ctx.fill();
-                ctx.strokeStyle = shipColor;
+                ctx.strokeStyle = '#dd70dd';
                 ctx.lineWidth = 1;
                 ctx.stroke();
 
@@ -777,19 +767,15 @@
             hpRating: 7,
             speedRating: 4,
             damageRating: 10,
-            fireShot: function (game, p, damageMult = 1) {
+            fireShot: function (game, p) {
                 AudioManager.playSound('plasma_dragon_shot');
-                const isCrit = damageMult > 1;
-                const finalDamage = Math.floor(this.shotDamage * damageMult);
                 game.playerBullets.push({
                     x: p.x, y: p.y - p.height / 2,
                     vx: 0, vy: -this.shotSpeed,
-                    size: isCrit ? this.shotSize * 1.5 : this.shotSize,
-                    damage: finalDamage,
+                    size: this.shotSize, damage: this.shotDamage,
                     isSuper: false, life: 100, trail: [],
-                    color: isCrit ? '#ff2d55' : this.color
+                    color: this.color
                 });
-                if (isCrit) spawnDamageNumber(p.x, p.y - 40, "CRIT!", "#ff2d55");
                 spawnParticles(p.x, p.y - p.height / 2, this.color, 7, 3);
             },
             fireSuper: function (game, p) {
@@ -803,7 +789,6 @@
             },
             drawShip: function (ctx, p) {
                 const thruster = Math.sin(p.thrusterPhase) * 0.3 + 0.7;
-                const shipColor = this.color;
 
                 // Engine glow
                 const eg = ctx.createRadialGradient(0, p.height / 2 + 5, 0, 0, p.height / 2 + 5, 20 * thruster);
@@ -820,7 +805,7 @@
                 ctx.fillStyle = `rgba(0,255,136,${0.7 * thruster})`;
                 ctx.fill();
 
-                ctx.shadowColor = shipColor;
+                ctx.shadowColor = '#00ff88';
                 ctx.shadowBlur = 18;
 
                 // Scale-like angular body
@@ -838,12 +823,12 @@
                 ctx.closePath();
 
                 const grad = ctx.createLinearGradient(0, -p.height / 2, 0, p.height / 2);
-                grad.addColorStop(0, shipColor);
+                grad.addColorStop(0, '#00ff88');
                 grad.addColorStop(0.5, '#00cc66');
                 grad.addColorStop(1, '#003311');
                 ctx.fillStyle = grad;
                 ctx.fill();
-                ctx.strokeStyle = shipColor;
+                ctx.strokeStyle = '#55ffa5';
                 ctx.lineWidth = 1.5;
                 ctx.stroke();
 
@@ -926,28 +911,20 @@
             get name() { return t('item_shield'); },
             emoji: '🛡️',
             get description() { return t('desc_shield'); },
-            price: 200,
+            price: 300,
             effect: (game) => {
-                game.player.hasShield = true;
-                game.player.shieldTimer = 600;
-                showMessage(t('shield_ready'), '#ffffff');
+                if (game.player.energy >= 1) {
+                    game.player.energy -= 1;
+                    game.player.hasShield = true;
+                    game.player.shieldTimer = 300;
+                    AudioManager.playSound('powerup');
+                    showMessage(t('shield_active'), '#7b2ff7', 2000);
+                } else {
+                    showMessage(t('insufficient'), '#ff0000', 500);
+                }
             }
         }
     ];
-
-    const DRONE_TYPES = [
-        { id: 'attack', name: 'drone_attack', color: '#ff2d55', icon: '⚔️' },
-        { id: 'support', name: 'drone_support', color: '#00f5ff', icon: '🔋' },
-        { id: 'defense', name: 'drone_defense', color: '#00ff88', icon: '🛡️' }
-    ];
-
-    const DRONE_TRAITS = {
-        attack: { id: 'crit', name: 'trait_crit', val: (lvl) => 5 + (lvl * 5) },
-        support: { id: 'recycle', name: 'trait_recycle', val: (lvl) => 0.1 + (lvl * 0.1) },
-        defense: { id: 'shield', name: 'trait_shield', val: (lvl) => 1 + (lvl * 0.5) }
-    };
-
-    const CRATE_COST = 500;
 
     // ===== PERSISTENT DATA (localStorage) =====
     let persistentData = {
@@ -961,8 +938,7 @@
         language: 'tr',
         upgrades: { hp: 0, speed: 0, damage: 0, energy: 0 },
         stats: { totalKills: 0, totalBosses: 0, totalGold: 0, maxWave: 0 },
-        unlockedAchievements: [],
-        drones: [] // { id, type, trait, level }
+        unlockedAchievements: []
     };
 
     const ACHIEVEMENT_LIST = [
@@ -991,7 +967,6 @@
                 if (!persistentData.upgrades) persistentData.upgrades = { hp: 0, speed: 0, damage: 0, energy: 0 };
                 if (!persistentData.stats) persistentData.stats = { totalKills: 0, totalBosses: 0, totalGold: 0, maxWave: 0 };
                 if (!persistentData.unlockedAchievements) persistentData.unlockedAchievements = [];
-                if (!persistentData.drones) persistentData.drones = [];
             }
         } catch (e) { /* ignore */ }
     }
@@ -1050,8 +1025,7 @@
                 beamMode: 0,
                 doubleShot: 0,
                 timeSlow: 0,
-                magnet: 0,
-                color: ship.color
+                magnet: 0
             },
 
             boss: null,
@@ -1336,27 +1310,20 @@
         const p = game.player;
         const ship = getSelectedShip();
 
-        // Drone: Critical Hit trait calculation
-        let damageMult = 1;
-        const attackDrone = persistentData.drones.find(d => d.type === 'attack');
-        if (attackDrone && Math.random() < DRONE_TRAITS.attack.val(attackDrone.level) / 100) {
-            damageMult = 2;
-        }
-
         if (isSuper) {
             if (p.energy < ship.superCost || superCooldown > 0) return;
             p.energy -= ship.superCost;
             superCooldown = ship.superCooldown;
-            ship.fireSuper(game, p, damageMult);
+            ship.fireSuper(game, p);
         } else {
             if (p.energy < ship.shotCost || shootCooldown > 0) return;
             p.energy -= ship.shotCost;
             shootCooldown = ship.shotCooldown;
-            ship.fireShot(game, p, damageMult);
+            ship.fireShot(game, p);
             
             // Double shot powerup
             if (p.doubleShot > 0) {
-                setTimeout(() => ship.fireShot(game, p, damageMult), 100);
+                setTimeout(() => ship.fireShot(game, p), 100);
             }
         }
     }
@@ -1576,8 +1543,7 @@
             width: 40, height: 50,
             thrusterPhase: 0,
             invincible: 0,
-            beamMode: 0,
-            color: ship.color
+            beamMode: 0
         };
         ship.drawShip(hitMaskCtx, fakePlayer);
         hitMaskCtx.restore();
@@ -1805,192 +1771,6 @@
             });
         });
     }
-
-    // ===== LOOT BOX SYSTEM =====
-    function openCrate() {
-        if (persistentData.totalCoins < CRATE_COST) {
-            AudioManager.playSound('hit');
-            showMessage(t('insufficient'), '#ff2d55');
-            return;
-        }
-
-        persistentData.totalCoins -= CRATE_COST;
-        saveData();
-        updateMenuUI();
-
-        const visual = $('crate-visual');
-        const result = $('crate-result');
-        const btn = $('open-crate-btn');
-
-        btn.disabled = true;
-        visual.classList.add('shaking');
-        AudioManager.playSound('btn_click');
-
-        setTimeout(() => {
-            visual.classList.remove('shaking');
-            visual.classList.add('opening');
-            
-            setTimeout(() => {
-                const droneType = DRONE_TYPES[Math.floor(Math.random() * DRONE_TYPES.length)];
-                const existing = persistentData.drones.find(d => d.type === droneType.id);
-                
-                if (existing) {
-                    existing.level++;
-                    showMessage(t('drone_upgraded'), droneType.color);
-                } else {
-                    persistentData.drones.push({
-                        type: droneType.id,
-                        level: 1
-                    });
-                    showMessage(t('new_drone_unlocked'), droneType.color);
-                }
-                
-                saveData();
-                visual.classList.remove('opening');
-                btn.disabled = false;
-                updateCrateUI();
-                renderCrateResult(droneType, existing ? existing.level : 1);
-            }, 1000);
-        }, 1500);
-    }
-
-    function renderCrateResult(type, level) {
-        const res = $('crate-result');
-        res.innerHTML = `
-            <div class="drone-card" style="border-color: ${type.color}">
-                <div class="drone-icon">${type.icon}</div>
-                <div>
-                    <div style="color: ${type.color}; font-weight: bold;">${t(type.name)}</div>
-                    <div style="font-size: 0.8rem; color: #aaa;">${t('level')} ${level}</div>
-                </div>
-            </div>
-        `;
-        res.classList.remove('hidden');
-    }
-
-    function updateCrateUI() {
-        const container = $('owned-drones');
-        container.innerHTML = '';
-        persistentData.drones.forEach(d => {
-            const type = DRONE_TYPES.find(t => t.id === d.type);
-            const card = document.createElement('div');
-            card.className = 'drone-card';
-            card.style.borderColor = type.color;
-            card.innerHTML = `
-                <div class="drone-icon">${type.icon}</div>
-                <div>
-                    <div style="color: ${type.color}">${t(type.name)}</div>
-                    <div style="font-size: 0.8rem">${t(DRONE_TRAITS[d.type].name).replace('%{val}', DRONE_TRAITS[d.type].val(d.level))}</div>
-                </div>
-            `;
-            container.appendChild(card);
-        });
-    }
-
-
-
-    // ===== ENVIRONMENTAL EVENTS =====
-    const EventManager = {
-        active: null,
-        timer: 0,
-        objects: [],
-        
-        update(game, p) {
-            if (!this.active) {
-                if (game.wave > 2 && Math.random() < 0.002) {
-                    this.startRandomEvent();
-                }
-                return;
-            }
-
-            this.timer--;
-            if (this.timer <= 0) this.stopEvent();
-
-            if (this.active === 'meteor') this.updateMeteors(p);
-            if (this.active === 'blackhole') this.updateBlackHole(p);
-        },
-
-        startRandomEvent() {
-            const events = ['meteor', 'nebula', 'blackhole'];
-            this.active = events[Math.floor(Math.random() * events.length)];
-            this.timer = 600 + Math.random() * 600;
-            
-            if (this.active === 'nebula') document.body.classList.add('nebula-active');
-            showMessage(t('event_' + this.active), '#ffaa00', 3000);
-            AudioManager.playSound('powerup');
-        },
-
-        stopEvent() {
-            document.body.classList.remove('nebula-active');
-            this.active = null;
-            this.objects = [];
-        },
-
-        updateMeteors(p) {
-            if (Math.random() < 0.1) {
-                this.objects.push({
-                    x: Math.random() * canvas.width,
-                    y: -50,
-                    size: 20 + Math.random() * 40,
-                    speed: 3 + Math.random() * 5,
-                    rot: 0,
-                    rotV: (Math.random() - 0.5) * 0.1
-                });
-            }
-            this.objects.forEach(m => {
-                m.y += m.speed;
-                m.rot += m.rotV;
-                if (circlesCollide(m, p, m.size * 0.8, 30)) {
-                    p.hp -= 5;
-                    m.y = 10000; // Remove
-                }
-            });
-            this.objects = this.objects.filter(m => m.y < canvas.height + 100);
-        },
-
-        updateBlackHole(p) {
-            const cx = canvas.width / 2;
-            const cy = canvas.height / 2;
-            const dx = cx - p.x;
-            const dy = cy - p.y;
-            const dist = Math.sqrt(dx*dx + dy*dy);
-            if (dist > 50) {
-                p.x += (dx / dist) * 1.5;
-                p.y += (dy / dist) * 1.5;
-            }
-        },
-
-        draw(ctx) {
-            if (this.active === 'meteor') {
-                this.objects.forEach(m => {
-                    ctx.save();
-                    ctx.translate(m.x, m.y);
-                    ctx.rotate(m.rot);
-                    ctx.fillStyle = '#555';
-                    ctx.beginPath();
-                    ctx.moveTo(0, -m.size);
-                    for(let i=0; i<6; i++) {
-                        const r = i%2===0 ? m.size : m.size*0.8;
-                        ctx.lineTo(Math.cos(i*Math.PI/3)*r, Math.sin(i*Math.PI/3)*r);
-                    }
-                    ctx.fill();
-                    ctx.restore();
-                });
-            }
-            if (this.active === 'blackhole') {
-                ctx.save();
-                ctx.beginPath();
-                const grad = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, 100);
-                grad.addColorStop(0, '#000');
-                grad.addColorStop(0.8, '#7b2ff7');
-                grad.addColorStop(1, 'transparent');
-                ctx.fillStyle = grad;
-                ctx.arc(canvas.width/2, canvas.height/2, 100, 0, Math.PI*2);
-                ctx.fill();
-                ctx.restore();
-            }
-        }
-    };
 
     function updateCoinDisplay() {
         hud.coins.textContent = game.coins;
@@ -2220,51 +2000,7 @@
             if (game.comboTimer <= 0) game.combo = 0;
         }
 
-        // --- Drones ---
-        updateDrones(p);
-        
-        // --- Events ---
-        EventManager.update(game, p);
-
         updateHUD();
-    }
-
-    let droneOrbit = 0;
-    function updateDrones(p) {
-        droneOrbit += 0.05;
-        
-        // Drone: Emergency Shield trait
-        const defenseDrone = persistentData.drones.find(d => d.type === 'defense');
-        if (defenseDrone && p.hp < p.maxHP * 0.2 && !p.hasShield && !p._droneShieldCooldown) {
-            p.hasShield = true;
-            p.shieldTimer = 300 * DRONE_TRAITS.defense.val(defenseDrone.level);
-            p._droneShieldCooldown = 1800; // 30 sec
-            showMessage(t('trait_shield'), DRONE_TYPES.find(t=>t.id==='defense').color);
-        }
-        if (p._droneShieldCooldown > 0) p._droneShieldCooldown--;
-    }
-
-    function drawDrones(ctx, p) {
-        persistentData.drones.forEach((d, i) => {
-            const type = DRONE_TYPES.find(t => t.id === d.type);
-            const angle = droneOrbit + (i * Math.PI * 2 / persistentData.drones.length);
-            const dx = p.x + Math.cos(angle) * 60;
-            const dy = p.y + Math.sin(angle) * 60;
-
-            ctx.save();
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = type.color;
-            ctx.fillStyle = type.color;
-            ctx.beginPath();
-            ctx.arc(dx, dy, 6, 0, Math.PI * 2);
-            ctx.fill();
-            
-            ctx.fillStyle = '#fff';
-            ctx.font = '10px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText(type.icon, dx, dy + 4);
-            ctx.restore();
-        });
     }
 
     // ===== BOSS DEFEATED =====
@@ -2288,14 +2024,6 @@
             maxHP: b.maxHP,
             value: headValue
         });
-
-        // Drone: Energy Recycle trait
-        const supportDrone = persistentData.drones.find(d => d.type === 'support');
-        if (supportDrone) {
-            const recycleVal = DRONE_TRAITS.support.val(supportDrone.level);
-            p.energy = Math.min(p.maxEnergy, p.energy + recycleVal);
-            showMessage(`${t('trait_recycle')} +${recycleVal.toFixed(1)}`, DRONE_TYPES.find(t=>t.id==='support').color);
-        }
 
         game.wave++;
         p.energy = Math.min(p.maxEnergy, p.energy + 3);
@@ -2356,7 +2084,6 @@
     function draw() {
         const W = canvas.width;
         const H = canvas.height;
-        const p = game.player;
 
         ctx.save();
 
@@ -2395,12 +2122,6 @@
             ctx.fillStyle = grad;
             ctx.fillRect(e.x - radius, e.y - radius, radius * 2, radius * 2);
         });
-
-        // --- Events ---
-        EventManager.draw(ctx);
-
-        // --- Drones ---
-        drawDrones(ctx, p);
 
         // --- Boss ---
         const b = game.boss;
@@ -2481,7 +2202,6 @@
 
     // ===== HELPER: hex to rgba =====
     function hexToRgba(hex, alpha) {
-        if (!hex || typeof hex !== 'string' || !hex.startsWith('#')) return `rgba(255,255,255,${alpha})`;
         const r = parseInt(hex.slice(1, 3), 16);
         const g = parseInt(hex.slice(3, 5), 16);
         const b = parseInt(hex.slice(5, 7), 16);
@@ -2785,8 +2505,7 @@
             width: 40, height: 50,
             thrusterPhase: Date.now() * 0.003,
             invincible: 0,
-            beamMode: 0,
-            color: ship.color
+            beamMode: 0
         };
 
         ship.drawShip(mCtx, fakePlayer);
@@ -2819,17 +2538,6 @@
     $('lab-back-btn').addEventListener('click', () => { AudioManager.playSound('btn_click'); goToMenu(); });
     $('achievements-btn').addEventListener('click', () => { AudioManager.playSound('btn_click'); openAchievements(); });
     $('achievements-back-btn').addEventListener('click', () => { AudioManager.playSound('btn_click'); goToMenu(); });
-    
-    $('crate-btn').addEventListener('click', () => { 
-        AudioManager.playSound('btn_click'); 
-        showScreen('crate'); 
-        updateCrateUI(); 
-    });
-    $('crate-back-btn').addEventListener('click', () => { AudioManager.playSound('btn_click'); goToMenu(); });
-    $('open-crate-btn').addEventListener('click', () => { openCrate(); });
-
-
-
     $('merchant-close-btn').addEventListener('click', () => { AudioManager.playSound('btn_click'); closeMerchant(); });
 
     function updateSettingsUI() {
