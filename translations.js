@@ -169,14 +169,7 @@ const translations = {
         event_nebula: "🌌 KOZMİK NEBULA!",
         event_blackhole: "🌀 KARA DELİK ÇEKİMİ!",
 
-        // Expansion: Customization
-        customize: "BOYA & İZ",
-        skin_color: "GÖVDE RENGİ",
-        engine_trail: "MOTOR İZİ",
-        trail_flame: "Klasik Alev",
-        trail_plasma: "Mavi Plazma",
-        trail_star: "Yıldız Tozu",
-        trail_void: "Karanlık Boşluk"
+
     },
     en: {
         title: "SPACE WAR",
@@ -342,15 +335,6 @@ const translations = {
         event_meteor: "⚠️ METEOR SHOWER!",
         event_nebula: "🌌 COSMIC NEBULA!",
         event_blackhole: "🌀 BLACK HOLE PULL!",
-
-        // Expansion: Customization
-        customize: "PAINT & TRAIL",
-        skin_color: "HULL COLOR",
-        engine_trail: "ENGINE TRAIL",
-        trail_flame: "Classic Flame",
-        trail_plasma: "Blue Plasma",
-        trail_star: "Star Dust",
-        trail_void: "Dark Void"
     },
     ru: {
         title: "КОСМИЧЕСКАЯ ВОЙНА",
@@ -865,13 +849,6 @@ const translations = {
         event_nebula: "🌌 ΚΟΣΜΙΚΟ ΝΕΦΕΛΩΜΑ!",
         event_blackhole: "🌀 ΕΛΞΗ ΜΑΥΡΗΣ ΤΡΥΠΑΣ!",
 
-        // Expansion: Customization
-        customize: "ΧΡΩΜΑ & ΙΧΝΟΣ",
-        skin_color: "ΧΡΩΜΑ ΚΥΤΟΥΣ",
-        engine_trail: "ΙΧΝΟΣ ΚΙΝΗΤΗΡΑ",
-        trail_flame: "Κλασική Φλόγα",
-        trail_plasma: "Μπλε Πλάσμα",
-        trail_star: "Αστρική Σκόνη",
-        trail_void: "Σκοτεινό Κενό"
+
     }
 };

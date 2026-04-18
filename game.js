@@ -14,7 +14,8 @@
         over: $('gameover-screen'),
         settings: $('settings-screen'),
         lab: $('lab-screen'),
-        achievements: $('achievements-screen')
+        achievements: $('achievements-screen'),
+        crate: $('crate-screen')
     };
 
     const hud = {
@@ -325,7 +326,7 @@
                     size: isCrit ? this.shotSize * 1.5 : this.shotSize,
                     damage: finalDamage,
                     isSuper: false, life: 100, trail: [],
-                    color: isCrit ? '#ff2d55' : (persistentData.customization.skin || this.color)
+                    color: isCrit ? '#ff2d55' : this.color
                 });
                 if (isCrit) spawnDamageNumber(p.x, p.y - 40, "CRIT!", "#ff2d55");
                 spawnParticles(p.x, p.y - p.height / 2, isCrit ? '#ff2d55' : this.color, 5, 2);
@@ -350,18 +351,12 @@
             },
             drawShip: function (ctx, p) {
                 const thruster = Math.sin(p.thrusterPhase) * 0.3 + 0.7;
-                const shipColor = persistentData.customization.skin || p.color;
+                const shipColor = this.color;
 
                 // Engine glow
-                const trailType = persistentData.customization.trail || 'flame';
-                let trailColor = '#ff9f00';
-                if (trailType === 'plasma') trailColor = '#00f5ff';
-                if (trailType === 'star') trailColor = '#fff';
-                if (trailType === 'void') trailColor = '#7b2ff7';
-
                 const engineGrad = ctx.createRadialGradient(0, p.height / 2 + 5, 0, 0, p.height / 2 + 5, 20 * thruster);
-                engineGrad.addColorStop(0, trailColor);
-                engineGrad.addColorStop(0.5, trailColor + '66');
+                engineGrad.addColorStop(0, '#ff9f00');
+                engineGrad.addColorStop(0.5, 'rgba(255,160,0,0.4)');
                 engineGrad.addColorStop(1, 'transparent');
                 ctx.fillStyle = engineGrad;
                 ctx.fillRect(-20, p.height / 2 - 5, 40, 30);
@@ -427,21 +422,27 @@
             hpRating: 3,
             speedRating: 8,
             damageRating: 6,
-            fireShot: function (game, p) {
+            fireShot: function (game, p, damageMult = 1) {
                 AudioManager.playSound('red_hawk_shot');
+                const isCrit = damageMult > 1;
+                const finalDamage = Math.floor(this.shotDamage * damageMult);
                 for (let dx = -8; dx <= 8; dx += 16) {
                     game.playerBullets.push({
                         x: p.x + dx, y: p.y - p.height / 2,
                         vx: 0, vy: -this.shotSpeed,
-                        size: this.shotSize, damage: this.shotDamage,
+                        size: isCrit ? this.shotSize * 1.5 : this.shotSize,
+                        damage: finalDamage,
                         isSuper: false, life: 100, trail: [],
-                        color: persistentData.customization.skin || this.color
+                        color: isCrit ? '#ff2d55' : this.color
                     });
                 }
+                if (isCrit) spawnDamageNumber(p.x, p.y - 40, "CRIT!", "#ff2d55");
                 spawnParticles(p.x, p.y - p.height / 2, this.color, 4, 2);
             },
-            fireSuper: function (game, p) {
+            fireSuper: function (game, p, damageMult = 1) {
                 AudioManager.playSound('red_hawk_super');
+                const isCrit = damageMult > 1;
+                const finalDamage = Math.floor(this.superDamage * damageMult);
                 for (let i = 0; i < 8; i++) {
                     const spread = (i - 3.5) * 0.12;
                     game.playerBullets.push({
@@ -450,18 +451,19 @@
                         vx: Math.sin(spread) * 6,
                         vy: -12 - Math.random() * 3,
                         size: 6,
-                        damage: this.superDamage,
+                        damage: finalDamage,
                         isSuper: true, life: 100, trail: [],
-                        color: '#ff6b35'
+                        color: isCrit ? '#ff2d55' : '#ff6b35'
                     });
                 }
+                if (isCrit) spawnDamageNumber(p.x, p.y - 40, "CRIT!", "#ff2d55");
                 game.screenShake = 8;
                 game.shakeIntensity = 6;
                 spawnParticles(p.x, p.y - p.height / 2, '#ff6b35', 20, 5);
             },
             drawShip: function (ctx, p) {
                 const thruster = Math.sin(p.thrusterPhase) * 0.3 + 0.7;
-                const shipColor = persistentData.customization.skin || p.color;
+                const shipColor = this.color;
 
                 // Dual engine glow
                 for (let dx = -10; dx <= 10; dx += 20) {
@@ -548,15 +550,19 @@
             hpRating: 9,
             speedRating: 3,
             damageRating: 7,
-            fireShot: function (game, p) {
+            fireShot: function (game, p, damageMult = 1) {
                 AudioManager.playSound('titan_shield_shot');
+                const isCrit = damageMult > 1;
+                const finalDamage = Math.floor(this.shotDamage * damageMult);
                 game.playerBullets.push({
                     x: p.x, y: p.y - p.height / 2,
                     vx: 0, vy: -this.shotSpeed,
-                    size: this.shotSize, damage: this.shotDamage,
+                    size: isCrit ? this.shotSize * 1.5 : this.shotSize,
+                    damage: finalDamage,
                     isSuper: false, life: 120, trail: [],
-                    color: persistentData.customization.skin || this.color
+                    color: isCrit ? '#ff2d55' : this.color
                 });
+                if (isCrit) spawnDamageNumber(p.x, p.y - 40, "CRIT!", "#ff2d55");
                 spawnParticles(p.x, p.y - p.height / 2, this.color, 6, 3);
             },
             fireSuper: function (game, p) {
@@ -579,7 +585,7 @@
             },
             drawShip: function (ctx, p) {
                 const thruster = Math.sin(p.thrusterPhase) * 0.3 + 0.7;
-                const shipColor = persistentData.customization.skin || p.color;
+                const shipColor = this.color;
 
                 // Engine glow
                 const eg = ctx.createRadialGradient(0, p.height / 2 + 5, 0, 0, p.height / 2 + 5, 22 * thruster);
@@ -664,17 +670,21 @@
             hpRating: 2,
             speedRating: 10,
             damageRating: 4,
-            fireShot: function (game, p) {
+            fireShot: function (game, p, damageMult = 1) {
                 AudioManager.playSound('ghost_blade_shot');
+                const isCrit = damageMult > 1;
+                const finalDamage = Math.floor(this.shotDamage * damageMult);
                 for (let dx = -6; dx <= 6; dx += 12) {
                     game.playerBullets.push({
                         x: p.x + dx, y: p.y - p.height / 2,
                         vx: 0, vy: -this.shotSpeed,
-                        size: this.shotSize, damage: this.shotDamage,
+                        size: isCrit ? this.shotSize * 1.5 : this.shotSize,
+                        damage: finalDamage,
                         isSuper: false, life: 80, trail: [],
-                        color: persistentData.customization.skin || this.color
+                        color: isCrit ? '#ff2d55' : this.color
                     });
                 }
+                if (isCrit) spawnDamageNumber(p.x, p.y - 40, "CRIT!", "#ff2d55");
                 spawnParticles(p.x, p.y - p.height / 2, this.color, 3, 1.5);
             },
             fireSuper: function (game, p) {
@@ -690,7 +700,7 @@
             drawShip: function (ctx, p) {
                 const thruster = Math.sin(p.thrusterPhase) * 0.3 + 0.7;
                 const ghostAlpha = p.invincible > 0 ? 0.5 + Math.sin(p.thrusterPhase * 5) * 0.2 : 1;
-                const shipColor = persistentData.customization.skin || p.color;
+                const shipColor = this.color;
 
                 ctx.globalAlpha = ghostAlpha;
 
@@ -767,15 +777,19 @@
             hpRating: 7,
             speedRating: 4,
             damageRating: 10,
-            fireShot: function (game, p) {
+            fireShot: function (game, p, damageMult = 1) {
                 AudioManager.playSound('plasma_dragon_shot');
+                const isCrit = damageMult > 1;
+                const finalDamage = Math.floor(this.shotDamage * damageMult);
                 game.playerBullets.push({
                     x: p.x, y: p.y - p.height / 2,
                     vx: 0, vy: -this.shotSpeed,
-                    size: this.shotSize, damage: this.shotDamage,
+                    size: isCrit ? this.shotSize * 1.5 : this.shotSize,
+                    damage: finalDamage,
                     isSuper: false, life: 100, trail: [],
-                    color: persistentData.customization.skin || this.color
+                    color: isCrit ? '#ff2d55' : this.color
                 });
+                if (isCrit) spawnDamageNumber(p.x, p.y - 40, "CRIT!", "#ff2d55");
                 spawnParticles(p.x, p.y - p.height / 2, this.color, 7, 3);
             },
             fireSuper: function (game, p) {
@@ -789,7 +803,7 @@
             },
             drawShip: function (ctx, p) {
                 const thruster = Math.sin(p.thrusterPhase) * 0.3 + 0.7;
-                const shipColor = persistentData.customization.skin || p.color;
+                const shipColor = this.color;
 
                 // Engine glow
                 const eg = ctx.createRadialGradient(0, p.height / 2 + 5, 0, 0, p.height / 2 + 5, 20 * thruster);
@@ -948,11 +962,7 @@
         upgrades: { hp: 0, speed: 0, damage: 0, energy: 0 },
         stats: { totalKills: 0, totalBosses: 0, totalGold: 0, maxWave: 0 },
         unlockedAchievements: [],
-        drones: [], // { id, type, trait, level }
-        customization: { 
-            skin: null, 
-            trail: 'flame' 
-        }
+        drones: [] // { id, type, trait, level }
     };
 
     const ACHIEVEMENT_LIST = [
@@ -982,7 +992,6 @@
                 if (!persistentData.stats) persistentData.stats = { totalKills: 0, totalBosses: 0, totalGold: 0, maxWave: 0 };
                 if (!persistentData.unlockedAchievements) persistentData.unlockedAchievements = [];
                 if (!persistentData.drones) persistentData.drones = [];
-                if (!persistentData.customization) persistentData.customization = { skin: null, trail: 'flame' };
             }
         } catch (e) { /* ignore */ }
     }
@@ -1567,7 +1576,8 @@
             width: 40, height: 50,
             thrusterPhase: 0,
             invincible: 0,
-            beamMode: 0
+            beamMode: 0,
+            color: ship.color
         };
         ship.drawShip(hitMaskCtx, fakePlayer);
         hitMaskCtx.restore();
@@ -1877,45 +1887,7 @@
         });
     }
 
-    // ===== CUSTOMIZATION SYSTEM =====
-    function renderCustomizeUI() {
-        const skins = ['#00f5ff', '#ff2d55', '#ff9f00', '#00ff88', '#7b2ff7', '#ffffff'];
-        const trails = [
-            { id: 'flame', name: 'trail_flame', color: '#ff9f00' },
-            { id: 'plasma', name: 'trail_plasma', color: '#00f5ff' },
-            { id: 'star', name: 'trail_star', color: '#fff' },
-            { id: 'void', name: 'trail_void', color: '#7b2ff7' }
-        ];
 
-        const skinList = $('skin-list');
-        skinList.innerHTML = '';
-        skins.forEach(color => {
-            const btn = document.createElement('div');
-            btn.className = `color-btn ${persistentData.customization.skin === color ? 'active' : ''}`;
-            btn.innerHTML = `<div class="color-inner" style="background: ${color}"></div>`;
-            btn.onclick = () => {
-                persistentData.customization.skin = color;
-                saveData();
-                renderCustomizeUI();
-            };
-            skinList.appendChild(btn);
-        });
-
-        const trailList = $('trail-list');
-        trailList.innerHTML = '';
-        trails.forEach(tData => {
-            const btn = document.createElement('div');
-            btn.className = `trail-btn ${persistentData.customization.trail === tData.id ? 'active' : ''}`;
-            btn.style.color = tData.color;
-            btn.innerHTML = `<span>${t(tData.name)}</span>`;
-            btn.onclick = () => {
-                persistentData.customization.trail = tData.id;
-                saveData();
-                renderCustomizeUI();
-            };
-            trailList.appendChild(btn);
-        });
-    }
 
     // ===== ENVIRONMENTAL EVENTS =====
     const EventManager = {
@@ -2384,6 +2356,7 @@
     function draw() {
         const W = canvas.width;
         const H = canvas.height;
+        const p = game.player;
 
         ctx.save();
 
@@ -2812,7 +2785,8 @@
             width: 40, height: 50,
             thrusterPhase: Date.now() * 0.003,
             invincible: 0,
-            beamMode: 0
+            beamMode: 0,
+            color: ship.color
         };
 
         ship.drawShip(mCtx, fakePlayer);
@@ -2854,12 +2828,7 @@
     $('crate-back-btn').addEventListener('click', () => { AudioManager.playSound('btn_click'); goToMenu(); });
     $('open-crate-btn').addEventListener('click', () => { openCrate(); });
 
-    $('customize-btn').addEventListener('click', () => { 
-        AudioManager.playSound('btn_click'); 
-        showScreen('customize'); 
-        renderCustomizeUI(); 
-    });
-    $('customize-back-btn').addEventListener('click', () => { AudioManager.playSound('btn_click'); goToMenu(); });
+
 
     $('merchant-close-btn').addEventListener('click', () => { AudioManager.playSound('btn_click'); closeMerchant(); });
 
