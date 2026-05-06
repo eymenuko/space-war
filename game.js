@@ -680,8 +680,8 @@
             },
             fireSuper: function (game, p) {
                 AudioManager.playSound('ghost_blade_super');
-                // Phase shift: invincibility + auto fire
-                p.invincible = 300; // 5 seconds
+                // Phase shift: %30 damage reduction + auto fire (no full invincibility)
+                p.damageReduction = 300; // 5 seconds
                 p.autoFire = 300;
                 game.screenShake = 4;
                 game.shakeIntensity = 3;
@@ -690,7 +690,7 @@
             },
             drawShip: function (ctx, p) {
                 const thruster = Math.sin(p.thrusterPhase) * 0.3 + 0.7;
-                const ghostAlpha = p.invincible > 0 ? 0.5 + Math.sin(p.thrusterPhase * 5) * 0.2 : 1;
+                const ghostAlpha = p.damageReduction > 0 ? 0.5 + Math.sin(p.thrusterPhase * 5) * 0.2 : 1;
 
                 ctx.globalAlpha = ghostAlpha;
 
@@ -1018,11 +1018,13 @@
                 speed: ship.speed + (persistentData.upgrades.speed * 0.5),
                 damageBonus: persistentData.upgrades.damage * 2,
                 invincible: 0,
+                damageReduction: 0,
                 thrusterPhase: 0,
                 hasShield: false,
                 shieldTimer: 0,
                 autoFire: 0,
                 beamMode: 0,
+                beamTickTimer: 0,
                 doubleShot: 0,
                 timeSlow: 0,
                 magnet: 0
@@ -1823,19 +1825,25 @@
         // --- Beam mode (Plasma Dragon ulti) ---
         if (p.beamMode > 0) {
             p.beamMode--;
-            // Continuous beam damage
+            p.beamTickTimer++;
+            // Deal 15% of boss maxHP every 60 frames (1 second)
             if (b && !b.entering) {
                 const beamHitDist = Math.abs(b.x - p.x);
-                if (beamHitDist < b.size + 10) {
-                    b.hp -= ship.superDamage;
+                if (beamHitDist < b.size + 30) {
+                    if (p.beamTickTimer % 60 === 0) {
+                        const tickDmg = Math.floor(b.maxHP * 0.15);
+                        b.hp -= tickDmg;
+                        spawnDamageNumber(b.x, b.y - 20, tickDmg, '#00ff88');
+                        game.screenShake = 4;
+                        game.shakeIntensity = 3;
+                    }
                     if (game.particles.length < 200) {
                         spawnParticles(b.x, b.y + b.size / 2, '#00ff88', 2, 2);
                     }
-                    if (p.beamMode % 10 === 0) {
-                        spawnDamageNumber(b.x, b.y - 20, ship.superDamage * 10, '#00ff88');
-                    }
                 }
             }
+        } else {
+            p.beamTickTimer = 0;
         }
 
         // --- Powerup Timers ---
@@ -1852,6 +1860,7 @@
 
         // --- Invincibility ---
         if (p.invincible > 0) p.invincible--;
+        if (p.damageReduction > 0) p.damageReduction--;
         p.thrusterPhase += 0.15;
 
         // --- Stars ---
@@ -1950,7 +1959,11 @@
                         showMessage(t('shield_broken'), '#ffffff');
                     } else {
                         AudioManager.playSound('hit');
-                        const dmg = 14 + Math.floor(game.wave * 2.5);
+                        let dmg = 14 + Math.floor(game.wave * 2.5);
+                        // Ghost Blade ulti: %30 damage reduction
+                        if (p.damageReduction > 0) {
+                            dmg = Math.floor(dmg * 0.7);
+                        }
                         p.hp -= dmg;
                         bullet.life = 0;
                         p.invincible = 18;
@@ -2171,6 +2184,60 @@
             ctx.fill();
             ctx.restore();
         });
+
+        // --- Plasma Dragon Beam Visual ---
+        if (game.player.beamMode > 0) {
+            const p = game.player;
+            const beamWidth = 18 + Math.sin(Date.now() * 0.02) * 6;
+            const beamX = p.x;
+            const beamTopY = 0;
+            const beamBottomY = p.y - p.height / 2;
+
+            // Outer glow
+            ctx.save();
+            const beamGrad = ctx.createLinearGradient(beamX - beamWidth * 2, 0, beamX + beamWidth * 2, 0);
+            beamGrad.addColorStop(0, 'transparent');
+            beamGrad.addColorStop(0.3, 'rgba(0,255,136,0.1)');
+            beamGrad.addColorStop(0.5, 'rgba(0,255,136,0.3)');
+            beamGrad.addColorStop(0.7, 'rgba(0,255,136,0.1)');
+            beamGrad.addColorStop(1, 'transparent');
+            ctx.fillStyle = beamGrad;
+            ctx.fillRect(beamX - beamWidth * 2, beamTopY, beamWidth * 4, beamBottomY - beamTopY);
+
+            // Core beam
+            ctx.shadowColor = '#00ff88';
+            ctx.shadowBlur = 30;
+            const coreGrad = ctx.createLinearGradient(beamX - beamWidth / 2, 0, beamX + beamWidth / 2, 0);
+            coreGrad.addColorStop(0, 'rgba(0,255,136,0.05)');
+            coreGrad.addColorStop(0.3, 'rgba(0,255,136,0.7)');
+            coreGrad.addColorStop(0.5, 'rgba(200,255,220,0.95)');
+            coreGrad.addColorStop(0.7, 'rgba(0,255,136,0.7)');
+            coreGrad.addColorStop(1, 'rgba(0,255,136,0.05)');
+            ctx.fillStyle = coreGrad;
+            ctx.fillRect(beamX - beamWidth / 2, beamTopY, beamWidth, beamBottomY - beamTopY);
+
+            // Bright center line
+            ctx.beginPath();
+            ctx.moveTo(beamX, beamTopY);
+            ctx.lineTo(beamX, beamBottomY);
+            ctx.strokeStyle = `rgba(255,255,255,${0.6 + Math.sin(Date.now() * 0.03) * 0.3})`;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Impact flash on boss
+            if (game.boss && !game.boss.entering) {
+                const bDist = Math.abs(game.boss.x - beamX);
+                if (bDist < game.boss.size + 30) {
+                    const impactGrad = ctx.createRadialGradient(beamX, game.boss.y, 0, beamX, game.boss.y, 40);
+                    impactGrad.addColorStop(0, 'rgba(200,255,220,0.8)');
+                    impactGrad.addColorStop(0.4, 'rgba(0,255,136,0.4)');
+                    impactGrad.addColorStop(1, 'transparent');
+                    ctx.fillStyle = impactGrad;
+                    ctx.fillRect(beamX - 40, game.boss.y - 40, 80, 80);
+                }
+            }
+            ctx.restore();
+        }
 
         // --- Player ---
         drawPlayer();
