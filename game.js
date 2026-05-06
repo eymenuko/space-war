@@ -845,39 +845,39 @@
     const BOSS_TYPES = [
         {
             name: "Zorgax", emoji: "👾", color: "#ff2d95",
-            glowColor: "rgba(255,45,149,0.4)", baseHP: 150, speed: 2,
-            attackRate: 80, pattern: "spread", size: 60,
-            bulletColor: "#ff2d95", bulletSpeed: 4
+            glowColor: "rgba(255,45,149,0.4)", baseHP: 280, speed: 3,
+            attackRate: 55, pattern: "spread", size: 60,
+            bulletColor: "#ff2d95", bulletSpeed: 5.5
         },
         {
             name: "Krypton", emoji: "🛸", color: "#00f5ff",
-            glowColor: "rgba(0,245,255,0.4)", baseHP: 200, speed: 1.5,
-            attackRate: 60, pattern: "spiral", size: 70,
-            bulletColor: "#00f5ff", bulletSpeed: 3.5
+            glowColor: "rgba(0,245,255,0.4)", baseHP: 350, speed: 2.5,
+            attackRate: 40, pattern: "spiral", size: 70,
+            bulletColor: "#00f5ff", bulletSpeed: 5
         },
         {
             name: "Nebula", emoji: "🌀", color: "#7b2ff7",
-            glowColor: "rgba(123,47,247,0.4)", baseHP: 180, speed: 3,
-            attackRate: 50, pattern: "wave", size: 55,
-            bulletColor: "#bf7bff", bulletSpeed: 5
+            glowColor: "rgba(123,47,247,0.4)", baseHP: 320, speed: 4,
+            attackRate: 35, pattern: "wave", size: 55,
+            bulletColor: "#bf7bff", bulletSpeed: 6.5
         },
         {
             name: "Infernox", emoji: "🔥", color: "#ff6b35",
-            glowColor: "rgba(255,107,53,0.4)", baseHP: 250, speed: 1,
-            attackRate: 40, pattern: "burst", size: 80,
-            bulletColor: "#ff6b35", bulletSpeed: 4.5
+            glowColor: "rgba(255,107,53,0.4)", baseHP: 420, speed: 1.8,
+            attackRate: 28, pattern: "burst", size: 80,
+            bulletColor: "#ff6b35", bulletSpeed: 6
         },
         {
             name: "Glacius", emoji: "❄️", color: "#80dfff",
-            glowColor: "rgba(128,223,255,0.4)", baseHP: 170, speed: 2.5,
-            attackRate: 70, pattern: "rain", size: 58,
-            bulletColor: "#80dfff", bulletSpeed: 3
+            glowColor: "rgba(128,223,255,0.4)", baseHP: 300, speed: 3.5,
+            attackRate: 45, pattern: "rain", size: 58,
+            bulletColor: "#80dfff", bulletSpeed: 4.5
         },
         {
             name: "Voidclaw", emoji: "🕳️", color: "#c850c0",
-            glowColor: "rgba(200,80,192,0.4)", baseHP: 220, speed: 2,
-            attackRate: 55, pattern: "homing", size: 65,
-            bulletColor: "#c850c0", bulletSpeed: 3
+            glowColor: "rgba(200,80,192,0.4)", baseHP: 380, speed: 3,
+            attackRate: 38, pattern: "homing", size: 65,
+            bulletColor: "#c850c0", bulletSpeed: 4.5
         }
     ];
 
@@ -1066,7 +1066,7 @@
     // ===== BOSS SPAWNING =====
     function spawnBoss() {
         const type = BOSS_TYPES[Math.floor(Math.random() * BOSS_TYPES.length)];
-        const hpMultiplier = 1 + (game.wave - 1) * 0.3;
+        const hpMultiplier = 1 + (game.wave - 1) * 0.5;
         const maxHP = Math.floor(type.baseHP * hpMultiplier);
 
         game.boss = {
@@ -1335,12 +1335,12 @@
         AudioManager.playSound('boss_shoot');
 
         const pattern = b.pattern;
-        const speed = b.bulletSpeed + (game.wave - 1) * 0.2;
+        const speed = b.bulletSpeed + (game.wave - 1) * 0.4;
 
         switch (pattern) {
             case 'spread': {
-                const count = 5 + Math.floor(game.wave / 3);
-                const arc = Math.PI * 0.6;
+                const count = 7 + Math.floor(game.wave / 2);
+                const arc = Math.PI * 0.75;
                 for (let i = 0; i < count; i++) {
                     const angle = -arc / 2 + (arc / (count - 1)) * i + Math.PI / 2;
                     game.bossBullets.push(makeBossBullet(b, Math.cos(angle) * speed, Math.sin(angle) * speed));
@@ -1348,7 +1348,7 @@
                 break;
             }
             case 'spiral': {
-                const count = 3;
+                const count = 4 + Math.floor(game.wave / 4);
                 for (let i = 0; i < count; i++) {
                     const angle = game.bossSpiralAngle + (Math.PI * 2 / count) * i;
                     game.bossBullets.push(makeBossBullet(b, Math.cos(angle) * speed, Math.sin(angle) * speed));
@@ -1364,7 +1364,7 @@
                 break;
             }
             case 'burst': {
-                const count = 8 + game.wave;
+                const count = 12 + game.wave * 2;
                 for (let i = 0; i < count; i++) {
                     const angle = (Math.PI * 2 / count) * i;
                     game.bossBullets.push(makeBossBullet(b, Math.cos(angle) * speed, Math.sin(angle) * speed));
@@ -1372,7 +1372,7 @@
                 break;
             }
             case 'rain': {
-                const count = 4 + Math.floor(game.wave / 2);
+                const count = 6 + game.wave;
                 for (let i = 0; i < count; i++) {
                     const rx = b.x + (Math.random() - 0.5) * 200;
                     game.bossBullets.push({
@@ -1483,22 +1483,22 @@
         AudioManager.playSound('powerup');
         switch(type) {
             case 'double_shot':
-                p.doubleShot = 600; // 10s
+                p.doubleShot = 360; // 6s
                 showMessage(t('msg_double_shot'), '#ffcc00');
                 break;
             case 'time_slow':
-                p.timeSlow = 480; // 8s
+                p.timeSlow = 300; // 5s
                 showMessage(t('msg_time_slow'), '#00f5ff');
                 break;
             case 'magnet':
-                p.magnet = 900; // 15s
+                p.magnet = 480; // 8s
                 showMessage(t('msg_magnet'), '#ff00ff');
                 break;
             case 'nuke':
                 game.screenShake = 30;
                 game.shakeIntensity = 15;
                 if (game.boss && !game.boss.entering) {
-                    game.boss.hp -= 100;
+                    game.boss.hp -= 60;
                     spawnDamageNumber(game.boss.x, game.boss.y, 100, '#ff4400');
                 }
                 game.bossBullets = [];
@@ -1923,7 +1923,7 @@
                 }
 
                 // Random powerup drop
-                if (Math.random() < 0.15) {
+                if (Math.random() < 0.06) {
                     spawnPowerup(bullet.x, bullet.y);
                 }
 
@@ -1950,10 +1950,10 @@
                         showMessage(t('shield_broken'), '#ffffff');
                     } else {
                         AudioManager.playSound('hit');
-                        const dmg = 8 + Math.floor(game.wave * 1.5);
+                        const dmg = 14 + Math.floor(game.wave * 2.5);
                         p.hp -= dmg;
                         bullet.life = 0;
-                        p.invincible = 30;
+                        p.invincible = 18;
                         spawnParticles(p.x, p.y, '#ff2d55', 12, 4);
                         spawnDamageNumber(p.x, p.y - 30, dmg, '#ff2d55');
                         game.screenShake = 6;
