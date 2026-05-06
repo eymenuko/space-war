@@ -888,7 +888,7 @@
             get name() { return t('item_potion'); },
             emoji: '🧪',
             get description() { return t('desc_potion'); },
-            price: 100,
+            price: 250,
             effect: (game) => {
                 const p = game.player;
                 p.hp = Math.min(p.maxHP, p.hp + Math.floor(p.maxHP * 0.25));
@@ -900,7 +900,7 @@
             get name() { return t('item_crystal'); },
             emoji: '💎',
             get description() { return t('desc_crystal'); },
-            price: 150,
+            price: 350,
             effect: (game) => {
                 game.player.energy = game.player.maxEnergy;
                 showMessage(t('energy_full'), '#00f5ff');
@@ -911,7 +911,7 @@
             get name() { return t('item_shield'); },
             emoji: '🛡️',
             get description() { return t('desc_shield'); },
-            price: 300,
+            price: 600,
             effect: (game) => {
                 if (game.player.energy >= 1) {
                     game.player.energy -= 1;
@@ -1577,6 +1577,7 @@
     // ===== MERCHANT SYSTEM =====
     function openMerchant() {
         game.paused = true;
+        game.merchantBoughtItems = [];
         renderMerchantUI();
         hud.merchantOverlay.classList.remove('hidden');
     }
@@ -1635,7 +1636,8 @@
             card.className = 'head-card';
             const canAfford = game.coins >= item.price;
             const alreadyBoughtShield = item.id === 'shield_generator' && game.player.hasShield;
-            const disabled = !canAfford || alreadyBoughtShield;
+            const alreadyBoughtThisVisit = game.merchantBoughtItems && game.merchantBoughtItems.includes(item.id);
+            const disabled = !canAfford || alreadyBoughtShield || alreadyBoughtThisVisit;
 
             card.innerHTML = `
                 <div class="head-info">
@@ -1646,7 +1648,7 @@
                     </div>
                 </div>
                 <button class="buy-btn" data-id="${item.id}" ${disabled ? 'disabled' : ''}>
-                    ${alreadyBoughtShield ? t('active') : `${t('buy')} 🪙${item.price}`}
+                    ${alreadyBoughtShield ? t('active') : alreadyBoughtThisVisit ? '✓' : `${t('buy')} 🪙${item.price}`}
                 </button>
             `;
             hud.shopList.appendChild(card);
@@ -1656,9 +1658,11 @@
             btn.addEventListener('click', () => {
                 const itemId = btn.dataset.id;
                 const item = SHOP_ITEMS.find(i => i.id === itemId);
-                if (item && game.coins >= item.price) {
+                if (item && game.coins >= item.price && !(game.merchantBoughtItems && game.merchantBoughtItems.includes(itemId))) {
                     game.coins -= item.price;
                     item.effect(game);
+                    if (!game.merchantBoughtItems) game.merchantBoughtItems = [];
+                    game.merchantBoughtItems.push(itemId);
                     renderMerchantUI();
                     updateCoinDisplay();
                 }
@@ -2028,7 +2032,7 @@
         game.bossKills++;
         showMessage(`${t('msg_boss_dead')} ${b.name}! +${bonusScore}`, '#00ff88');
 
-        const headValue = Math.floor(50 + b.maxHP * 0.5 + game.wave * 20);
+        const headValue = Math.floor(20 + b.maxHP * 0.15 + game.wave * 8);
         game.bossHeads.push({
             name: b.name,
             emoji: b.emoji,
