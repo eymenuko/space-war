@@ -45,7 +45,7 @@
     };
 
     // ===== CONSTANTS =====
-    const STAR_COUNT = 200;
+    const STAR_COUNT = 250;
     const MAX_ENERGY = 10;
 
     // ===== AUDIO MANAGER =====
@@ -54,8 +54,8 @@
         bgmInterval: null,
         bgmStep: 0,
         bgmNotes: [220, 220, 261.63, 293.66, 220, 220, 196, 164.81],
-        
-        init: function() {
+
+        init: function () {
             if (!this.ctx) {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 if (AudioContext) {
@@ -67,17 +67,17 @@
             }
         },
 
-        playSound: function(type) {
+        playSound: function (type) {
             if (!this.ctx || !persistentData.sfxEnabled) return;
             if (this.ctx.state === 'suspended') this.ctx.resume();
-            
+
             const osc = this.ctx.createOscillator();
             const gain = this.ctx.createGain();
             osc.connect(gain);
             gain.connect(this.ctx.destination);
             const now = this.ctx.currentTime;
-            
-            switch(type) {
+
+            switch (type) {
                 case 'star_hunter_shot':
                     osc.type = 'square';
                     osc.frequency.setValueAtTime(880, now);
@@ -225,11 +225,11 @@
             }
         },
 
-        playBGM: function() {
+        playBGM: function () {
             this.init();
             this.stopBGM();
             if (!this.ctx || !persistentData.bgmEnabled) return;
-            
+
             this.bgmInterval = setInterval(() => {
                 if (this.ctx.state === 'suspended') return;
                 const osc = this.ctx.createOscillator();
@@ -246,7 +246,7 @@
             }, 250);
         },
 
-        stopBGM: function() {
+        stopBGM: function () {
             if (this.bgmInterval) {
                 clearInterval(this.bgmInterval);
                 this.bgmInterval = null;
@@ -258,7 +258,7 @@
     function applyLanguage() {
         const lang = persistentData.language || 'tr';
         const dict = translations[lang] || translations['tr'];
-        
+
         // Update all elements with data-i18n
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
@@ -417,7 +417,7 @@
             maxHP: 80,
             speed: 8,
             energyGain: 0.015,
-            shotCost: 0.5,
+            shotCost: 0.9,
             superCost: 5,
             shotDamage: 8,
             shotSpeed: 15,
@@ -544,7 +544,7 @@
             shotSize: 8,
             shotCooldown: 20,
             superCooldown: 60,
-            superDamage: 50,
+            superDamage: 60,
             get attackDesc() { return t('atk_titan'); },
             get superDesc() { return t('sup_titan'); },
             hpRating: 9,
@@ -1115,7 +1115,7 @@
         $('dialogue-emoji').textContent = emoji;
         container.classList.remove('hidden');
         container.classList.add('active');
-        
+
         // Brief pause feel
         game.paused = true;
         setTimeout(() => {
@@ -1195,7 +1195,7 @@
 
     function handleJoystickMove(e) {
         if (!joystickActive) return;
-        
+
         let touch;
         if (e.touches) {
             for (let i = 0; i < e.touches.length; i++) {
@@ -1210,15 +1210,15 @@
         }
 
         let dx = touch.clientX - joystickStartPos.x;
-        
+
         if (dx > maxJoystickDistance) dx = maxJoystickDistance;
         if (dx < -maxJoystickDistance) dx = -maxJoystickDistance;
-        
+
         const moveX = dx;
         const moveY = 0; // Sadece X ekseninde hareket etsin
-        
+
         hud.joystickKnob.style.transform = `translate(${moveX}px, ${moveY}px)`;
-        
+
         // Normalize joystick value (-1 to 1)
         touchState.joystickX = moveX / maxJoystickDistance;
         touchState.joystickY = 0;
@@ -1226,7 +1226,7 @@
 
     function handleJoystickEnd(e) {
         if (!joystickActive) return;
-        
+
         if (e && e.changedTouches) {
             let found = false;
             for (let i = 0; i < e.changedTouches.length; i++) {
@@ -1248,7 +1248,7 @@
     hud.joystickContainer.addEventListener('touchstart', e => {
         e.preventDefault();
         if (joystickActive) return;
-        
+
         joystickActive = true;
         const touch = e.changedTouches[0];
         joystickTouchId = touch.identifier;
@@ -1264,7 +1264,7 @@
     window.addEventListener('touchmove', handleJoystickMove, { passive: false });
     window.addEventListener('touchend', handleJoystickEnd);
     window.addEventListener('touchcancel', handleJoystickEnd);
-    
+
     // Mouse support for joystick (testing)
     hud.joystickContainer.addEventListener('mousedown', e => {
         if (joystickActive) return;
@@ -1322,7 +1322,7 @@
             p.energy -= ship.shotCost;
             shootCooldown = ship.shotCooldown;
             ship.fireShot(game, p);
-            
+
             // Double shot powerup
             if (p.doubleShot > 0) {
                 setTimeout(() => ship.fireShot(game, p), 100);
@@ -1483,7 +1483,7 @@
     function applyPowerup(type) {
         const p = game.player;
         AudioManager.playSound('powerup');
-        switch(type) {
+        switch (type) {
             case 'double_shot':
                 p.doubleShot = 360; // 6s
                 showMessage(t('msg_double_shot'), '#ffcc00');
@@ -1554,15 +1554,15 @@
 
     function checkPixelCollision(px, py, bx, by, bRadius) {
         if (!hitMaskData) return false;
-        
+
         const relX = Math.round(bx - px + 50);
         const relY = Math.round(by - py + 50);
         const r = Math.ceil(bRadius);
-        
+
         for (let y = relY - r; y <= relY + r; y++) {
             for (let x = relX - r; x <= relX + r; x++) {
                 if (x >= 0 && x < 100 && y >= 0 && y < 100) {
-                    if ((x - relX)*(x - relX) + (y - relY)*(y - relY) <= r*r) {
+                    if ((x - relX) * (x - relX) + (y - relY) * (y - relY) <= r * r) {
                         const alpha = hitMaskData[(y * 100 + x) * 4 + 3];
                         if (alpha > 200) {
                             return true;
@@ -1795,7 +1795,7 @@
         // --- Player Movement ---
         if (keys['ArrowLeft'] || keys['KeyA']) p.x -= p.speed;
         if (keys['ArrowRight'] || keys['KeyD']) p.x += p.speed;
-        
+
         // Joystick movement
         if (persistentData.touchMode && Math.abs(touchState.joystickX) > 0.1) {
             p.x += touchState.joystickX * p.speed;
@@ -1830,12 +1830,12 @@
         if (p.beamMode > 0) {
             p.beamMode--;
             p.beamTickTimer++;
-            // Deal 15% of boss maxHP every 60 frames (1 second)
+            // Deal 20% of boss current HP every 60 frames (1 second)
             if (b && !b.entering) {
                 const beamHitDist = Math.abs(b.x - p.x);
                 if (beamHitDist < b.size + 30) {
                     if (p.beamTickTimer % 60 === 0) {
-                        const tickDmg = Math.floor(b.maxHP * 0.15);
+                        const tickDmg = Math.floor(b.hp * 0.20);
                         b.hp -= tickDmg;
                         spawnDamageNumber(b.x, b.y - 20, tickDmg, '#00ff88');
                         game.screenShake = 4;
@@ -1924,7 +1924,7 @@
 
                 game.combo++;
                 game.comboTimer = 60;
-                
+
                 if (game.combo >= 10 && game.combo % 10 === 0) {
                     showMessage(t('serial_killer'), '#ff2d55', 2000);
                     game.player.energy = Math.min(game.player.maxEnergy, game.player.energy + 2);
