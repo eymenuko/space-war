@@ -27,6 +27,7 @@
             
             <div class="auth-box">
                 <form id="auth-form" autocomplete="off">
+                    <input type="text" id="auth-username" placeholder="Pilot Adı (İsteğe Bağlı)" class="neon-input">
                     <input type="email" id="auth-email" placeholder="E-posta Adresi" required class="neon-input">
                     <input type="password" id="auth-password" placeholder="Şifre" required class="neon-input">
                     <div id="auth-error" class="auth-error hidden"></div>
@@ -302,6 +303,16 @@
                         <option value="el">Ελληνικά</option>
                     </select>
                 </div>
+
+                <div class="profile-section" style="background: rgba(123,47,247,0.1); padding: 15px; border: 2px solid #7b2ff7; border-radius: 10px; display: flex; flex-direction: column; gap: 10px;">
+                    <span style="font-size: 18px; font-weight: bold; color: #fff;" data-i18n="username">Kullanıcı Adı</span>
+                    <input type="text" id="settings-username" placeholder="Yeni Kullanıcı Adı" class="neon-input" style="padding: 8px 12px; font-size: 16px;">
+                    <button id="update-username-btn" class="neon-btn secondary" style="padding: 10px; font-size: 14px;">
+                        <span data-i18n="update_name">İSMİ GÜNCELLE</span>
+                    </button>
+                    <div id="username-status" style="font-size: 14px; text-align: center; color: #00f5ff;" class="hidden"></div>
+                </div>
+
                 <button id="toggle-sfx-btn" class="neon-btn">
                     <span data-i18n="sfx_on">SES EFEKTLERİ: AÇIK</span>
                 </button>

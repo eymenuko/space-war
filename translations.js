@@ -157,7 +157,13 @@ const translations = {
         rank: "SIRA",
         player: "PİLOT",
         score_val: "SKOR",
-        loading: "Yükleniyor..."
+        loading: "Yükleniyor...",
+        
+        // Profile
+        username: "Kullanıcı Adı",
+        username_placeholder: "Kullanıcı adınızı girin",
+        update_name: "İSMİ GÜNCELLE",
+        name_updated: "Kullanıcı adı güncellendi!"
     },
     en: {
         title: "SPACE WAR",
@@ -312,7 +318,13 @@ const translations = {
         rank: "RANK",
         player: "PILOT",
         score_val: "SCORE",
-        loading: "Loading..."
+        loading: "Loading...",
+
+        // Profile
+        username: "Username",
+        username_placeholder: "Enter your username",
+        update_name: "UPDATE NAME",
+        name_updated: "Username updated!"
     },
     ru: {
         title: "КОСМИЧЕСКАЯ ВОЙНА",

@@ -2636,7 +2636,7 @@
     function saveHighScore(score) {
         if (!currentUser) return;
         
-        const username = currentUser.email ? currentUser.email.split('@')[0] : 'Pilot';
+        const username = userDisplayName || (currentUser.email ? currentUser.email.split('@')[0] : 'Pilot');
         const userRef = db.collection('leaderboard').doc(currentUser.uid);
         
         userRef.get().then((doc) => {
@@ -2699,6 +2699,38 @@
         showScreen('start');
     });
 
+    // Username Update Logic
+    $('update-username-btn').addEventListener('click', () => {
+        if (!currentUser) return;
+        
+        const newName = $('settings-username').value.trim();
+        if (!newName) return;
+        
+        AudioManager.playSound('btn_click');
+        const status = $('username-status');
+        status.textContent = "Güncelleniyor...";
+        status.classList.remove('hidden');
+        
+        // Update users collection
+        db.collection('users').doc(currentUser.uid).update({
+            username: newName
+        }).then(() => {
+            userDisplayName = newName;
+            $('menu-ship-name').textContent = newName;
+            
+            // Also update leaderboard entry if exists
+            return db.collection('leaderboard').doc(currentUser.uid).update({
+                name: newName
+            }).catch(() => {}); // Ignore if no leaderboard entry yet
+        }).then(() => {
+            status.textContent = t('name_updated');
+            setTimeout(() => status.classList.add('hidden'), 3000);
+        }).catch(err => {
+            console.error("Update error:", err);
+            status.textContent = "Hata oluştu.";
+        });
+    });
+
     const authForm = $('auth-form');
     const authEmail = $('auth-email');
     const authPassword = $('auth-password');
@@ -2706,15 +2738,36 @@
     const btnRegister = $('btn-register');
     const btnGoogleLogin = $('btn-google-login');
     const logoutBtn = $('logout-btn');
+    const authUsername = $('auth-username');
 
     let currentUser = null;
+    let userDisplayName = '';
+
+    function fetchUserData(user) {
+        db.collection('users').doc(user.uid).get().then(doc => {
+            if (doc.exists) {
+                userDisplayName = doc.data().username || (user.email ? user.email.split('@')[0] : 'Pilot');
+            } else {
+                userDisplayName = user.email ? user.email.split('@')[0] : 'Pilot';
+                // Create user doc if it doesn't exist
+                db.collection('users').doc(user.uid).set({
+                    username: userDisplayName,
+                    email: user.email
+                });
+            }
+            $('menu-ship-name').textContent = userDisplayName;
+            $('settings-username').value = userDisplayName;
+        }).catch(err => {
+            console.error("Error fetching user data:", err);
+            userDisplayName = user.email ? user.email.split('@')[0] : 'Pilot';
+            $('menu-ship-name').textContent = userDisplayName;
+        });
+    }
 
     auth.onAuthStateChanged(user => {
         if (user) {
             currentUser = user;
-            // Update menu username to be email prefix
-            const username = user.email ? user.email.split('@')[0] : 'Pilot';
-            $('menu-ship-name').textContent = username;
+            fetchUserData(user);
             
             // Set language and update UI
             applyLanguage();
@@ -2724,6 +2777,7 @@
             goToMenu();
         } else {
             currentUser = null;
+            userDisplayName = '';
             applyLanguage();
             showScreen('auth');
         }
@@ -2759,6 +2813,14 @@
         authError.classList.add('hidden');
         
         auth.createUserWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                const username = authUsername.value || email.split('@')[0];
+                return db.collection('users').doc(user.uid).set({
+                    username: username,
+                    email: email
+                });
+            })
             .then(() => {
                 AudioManager.playSound('btn_click');
             })
