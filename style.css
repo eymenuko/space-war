@@ -1770,3 +1770,47 @@ body {
         font-size: 1rem;
     }
 }
+
+/* Leaderboard Specific Styles */
+.leaderboard-item {
+    display: grid;
+    grid-template-columns: 50px 1fr 100px;
+    align-items: center;
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(0, 245, 255, 0.1);
+    border-radius: 10px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.leaderboard-item:hover {
+    background: rgba(0, 245, 255, 0.05);
+    border-color: rgba(0, 245, 255, 0.3);
+}
+
+.leaderboard-item.top-3 {
+    border-color: rgba(255, 215, 0, 0.4);
+    background: rgba(255, 215, 0, 0.05);
+}
+
+.rank-val {
+    font-family: 'Orbitron', sans-serif;
+    color: #ffd700;
+    font-weight: 900;
+}
+
+.player-name {
+    color: #fff;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.score-val {
+    font-family: 'Orbitron', sans-serif;
+    color: #00f5ff;
+    text-align: right;
+    font-weight: 700;
+}

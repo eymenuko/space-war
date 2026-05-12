@@ -149,7 +149,15 @@ const translations = {
         
         // Settings Extra
         reset_progress: "İlerlemeyi Sıfırla",
-        confirm_reset: "Tüm ilerlemeniz silinecek. Emin misiniz?"
+        confirm_reset: "Tüm ilerlemeniz silinecek. Emin misiniz?",
+        
+        // Leaderboard
+        leaderboard: "🏆 SIRALAMA",
+        leaderboard_title: "🏆 KÜRESEL SIRALAMA",
+        rank: "SIRA",
+        player: "PİLOT",
+        score_val: "SKOR",
+        loading: "Yükleniyor..."
     },
     en: {
         title: "SPACE WAR",
@@ -296,7 +304,15 @@ const translations = {
 
         // Settings Extra
         reset_progress: "Reset Progress",
-        confirm_reset: "All your progress will be deleted. Are you sure?"
+        confirm_reset: "All your progress will be deleted. Are you sure?",
+
+        // Leaderboard
+        leaderboard: "🏆 RANKINGS",
+        leaderboard_title: "🏆 GLOBAL LEADERBOARD",
+        rank: "RANK",
+        player: "PILOT",
+        score_val: "SCORE",
+        loading: "Loading..."
     },
     ru: {
         title: "КОСМИЧЕСКАЯ ВОЙНА",

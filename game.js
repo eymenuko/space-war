@@ -15,7 +15,8 @@
         over: $('gameover-screen'),
         settings: $('settings-screen'),
         lab: $('lab-screen'),
-        achievements: $('achievements-screen')
+        achievements: $('achievements-screen'),
+        leaderboard: $('leaderboard-screen')
     };
 
     const hud = {
@@ -938,7 +939,7 @@
         bgmEnabled: true,
         language: 'tr',
         upgrades: { hp: 0, speed: 0, damage: 0, energy: 0 },
-        stats: { totalKills: 0, totalBosses: 0, totalGold: 0, maxWave: 0 },
+        stats: { totalKills: 0, totalBosses: 0, totalGold: 0, maxWave: 0, highScore: 0 },
         unlockedAchievements: []
     };
 
@@ -2387,7 +2388,14 @@
 
         // Save coins to persistent storage
         persistentData.totalCoins += game.coinsEarnedThisRun;
+        
+        // Update local high score
+        if (game.score > persistentData.stats.highScore) {
+            persistentData.stats.highScore = game.score;
+        }
+        
         saveData();
+        saveHighScore(game.score); // Save to Firebase
 
         $('final-score').textContent = game.score;
         $('final-wave').textContent = game.wave;
@@ -2622,6 +2630,74 @@
 
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // ===== LEADERBOARD LOGIC =====
+    function saveHighScore(score) {
+        if (!currentUser) return;
+        
+        const username = currentUser.email ? currentUser.email.split('@')[0] : 'Pilot';
+        const userRef = db.collection('leaderboard').doc(currentUser.uid);
+        
+        userRef.get().then((doc) => {
+            if (!doc.exists || score > doc.data().score) {
+                userRef.set({
+                    name: username,
+                    score: score,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+            }
+        }).catch(err => console.error("Error saving score:", err));
+    }
+
+    function loadLeaderboard() {
+        const listContainer = $('leaderboard-list');
+        listContainer.innerHTML = `<div class="loading-spinner">${t('loading')}</div>`;
+        
+        db.collection('leaderboard')
+            .orderBy('score', 'desc')
+            .limit(20)
+            .get()
+            .then((querySnapshot) => {
+                listContainer.innerHTML = '';
+                let rank = 1;
+                
+                if (querySnapshot.empty) {
+                    listContainer.innerHTML = `<div style="text-align:center; padding:20px; color:#aaa;">Henüz skor yok. İlk sen ol!</div>`;
+                    return;
+                }
+
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const item = document.createElement('div');
+                    item.className = `leaderboard-item ${rank <= 3 ? 'top-3' : ''}`;
+                    
+                    item.innerHTML = `
+                        <div class="rank-val">#${rank}</div>
+                        <div class="player-name">${data.name || 'Bilinmeyen'}</div>
+                        <div class="score-val">${data.score.toLocaleString()}</div>
+                    `;
+                    listContainer.appendChild(item);
+                    rank++;
+                });
+            })
+            .catch((error) => {
+                console.error("Error loading leaderboard:", error);
+                listContainer.innerHTML = `<div style="color:#ff2d55; text-align:center; padding:20px;">Hata oluştu.</div>`;
+            });
+    }
+
+    // Leaderboard Listeners
+    $('leaderboard-btn').addEventListener('click', () => {
+        AudioManager.playSound('btn_click');
+        loadLeaderboard();
+        showScreen('leaderboard');
+    });
+
+    $('leaderboard-close-btn').addEventListener('click', () => {
+        AudioManager.playSound('btn_click');
+        showScreen('start');
+    });
 
     const authForm = $('auth-form');
     const authEmail = $('auth-email');
