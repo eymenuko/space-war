@@ -140,7 +140,7 @@ body {
     color: #7b8cde;
     letter-spacing: 0.5em;
     text-transform: uppercase;
-    margin-bottom: 2em;
+    margin-bottom: 1.2em;
 }
 
 /* ===== MENU SHIP INFO ===== */
@@ -175,23 +175,23 @@ body {
     font-size: 1rem;
     font-weight: 700;
     color: #ffd700;
-    margin-bottom: 2em;
+    margin-bottom: 1em;
     text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
 }
 
 .start-instructions {
     display: flex;
-    gap: 1.5rem;
+    gap: 1rem;
     justify-content: center;
     flex-wrap: wrap;
-    margin-bottom: 3em;
+    margin-bottom: 2rem;
 }
 
 .instruction-item {
     background: rgba(123, 47, 247, 0.15);
     border: 1px solid rgba(123, 47, 247, 0.3);
     border-radius: 12px;
-    padding: 0.8em 1.5em;
+    padding: 0.5em 1.2em;
     font-size: 1rem;
     display: flex;
     align-items: center;
@@ -209,12 +209,22 @@ body {
 }
 
 .menu-buttons {
-    display: flex;
-    gap: 1.5rem;
-    justify-content: center;
-    flex-wrap: wrap;
-    max-width: 900px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    max-width: 600px;
     margin: 0 auto;
+    width: 100%;
+}
+
+#start-btn {
+    grid-column: span 2;
+}
+
+.menu-buttons .neon-btn {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 1.1rem;
 }
 
 /* ===== NEON BUTTON ===== */
@@ -1151,8 +1161,7 @@ body {
     }
 
     .menu-buttons {
-        flex-direction: column;
-        align-items: center;
+        grid-template-columns: 1fr;
     }
 }
 
