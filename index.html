@@ -61,6 +61,13 @@
             <div id="menu-pilot-info" class="menu-pilot-info">
                 <span data-i18n="pilot_label">PİLOT: </span><span id="menu-pilot-name">...</span>
             </div>
+            <div id="menu-level-container" class="menu-level-container">
+                <div class="level-badge" id="menu-level">LVL 1</div>
+                <div class="xp-bar-outer">
+                    <div id="menu-xp-bar" class="xp-bar-inner" style="width: 0%"></div>
+                    <span id="menu-xp-text" class="xp-text">0 / 100 XP</span>
+                </div>
+            </div>
             <div id="menu-ship-info" class="menu-ship-info">
                 <span id="menu-ship-icon" class="menu-ship-icon">🚀</span>
                 <span id="menu-ship-name" class="menu-ship-name">Yıldız Avcısı</span>
@@ -89,6 +96,12 @@
                 </button>
                 <button id="leaderboard-btn" class="neon-btn leaderboard">
                     <span data-i18n="leaderboard">🏆 SIRALAMA</span>
+                </button>
+                <button id="missions-btn" class="neon-btn secondary">
+                    <span data-i18n="missions_btn">📅 GÖREVLER</span>
+                </button>
+                <button id="social-btn" class="neon-btn social">
+                    <span data-i18n="social_btn">👥 SOSYAL</span>
                 </button>
             </div>
         </div>
@@ -287,14 +300,48 @@
                 <button id="lb-tab-all" class="neon-btn small active" data-i18n="all_time">GENEL</button>
                 <button id="lb-tab-monthly" class="neon-btn small secondary" data-i18n="monthly">AYLIK</button>
             </div>
-            <div id="leaderboard-list" class="achievements-list" style="max-height: 55vh;">
+            
+            <div id="leaderboard-list" class="achievements-list" style="max-height: 60vh;">
                 <!-- Scores will be loaded here -->
                 <div class="loading-spinner" style="text-align: center; color: #00f5ff; padding: 20px;" data-i18n="loading">Yükleniyor...</div>
             </div>
         </div>
     </div>
 
-    <!-- Settings Screen -->
+    <!-- Missions Screen -->
+    <div id="missions-screen" class="screen">
+        <div class="stars-bg"></div>
+        <div class="lab-content">
+            <div class="lab-header">
+                <h1 class="lab-title" data-i18n="missions_title">📅 GÜNLÜK GÖREVLER</h1>
+                <button id="missions-close-btn" class="neon-btn secondary small" data-i18n="back">◀ GERİ</button>
+            </div>
+            <div id="missions-list" class="achievements-list">
+                <!-- Missions will be loaded here -->
+                <div class="loading-spinner" data-i18n="loading">Yükleniyor...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Social Screen -->
+    <div id="social-screen" class="screen">
+        <div class="stars-bg"></div>
+        <div class="lab-content">
+            <div class="lab-header">
+                <h1 class="lab-title" data-i18n="social_title">👥 SOSYAL MERKEZ</h1>
+                <button id="social-close-btn" class="neon-btn secondary small" data-i18n="back">◀ GERİ</button>
+            </div>
+            
+            <div class="pilot-search" style="margin-bottom: 25px; display: flex; gap: 10px;">
+                <input type="text" id="pilot-search-input" placeholder="Pilot Ara..." class="neon-input" data-i18n="search_placeholder" style="flex: 1; padding: 12px;">
+                <button id="pilot-search-btn" class="neon-btn small" data-i18n="search_pilot">ARA</button>
+            </div>
+            
+            <div id="search-results" class="hidden" style="margin-bottom: 20px;"></div>
+            
+            <!-- Future: Friends List here -->
+        </div>
+    </div>
     <div id="settings-screen" class="screen">
         <div class="stars-bg"></div>
         <div class="gameover-content">

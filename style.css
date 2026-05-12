@@ -1844,3 +1844,109 @@ body {
 .leaderboard-tabs {
     justify-content: center;
 }
+
+/* Level & XP System Styles */
+.menu-level-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1.2rem;
+    width: 100%;
+    max-width: 300px;
+}
+
+.level-badge {
+    background: linear-gradient(135deg, #7b2ff7, #00f5ff);
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-weight: 800;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    box-shadow: 0 0 10px rgba(123, 47, 247, 0.5);
+    min-width: 60px;
+    text-align: center;
+}
+
+.xp-bar-outer {
+    flex-grow: 1;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(0, 245, 255, 0.2);
+}
+
+.xp-bar-inner {
+    height: 100%;
+    background: linear-gradient(90deg, #00f5ff, #7b2ff7);
+    width: 0%;
+    transition: width 0.5s ease-out;
+    box-shadow: 0 0 10px rgba(0, 245, 255, 0.5);
+}
+
+.xp-text {
+    position: absolute;
+    top: -15px;
+    right: 0;
+    font-size: 0.75rem;
+    color: #00f5ff;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+}
+
+/* Social System Styles */
+.pilot-profile-card {
+    background: rgba(123, 47, 247, 0.15);
+    border: 2px solid #7b2ff7;
+    border-radius: 15px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    box-shadow: 0 0 20px rgba(123, 47, 247, 0.3);
+    animation: slideIn 0.3s ease-out;
+}
+
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.profile-name {
+    font-size: 1.5rem;
+    color: #00f5ff;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+}
+
+.profile-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.profile-stat-box {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.stat-box-label {
+    font-size: 0.8rem;
+    color: #aaa;
+}
+
+.stat-box-value {
+    font-size: 1.2rem;
+    color: #fff;
+    font-weight: 700;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

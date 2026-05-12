@@ -166,7 +166,31 @@ const translations = {
         name_updated: "Kullanıcı adı güncellendi!",
         monthly: "AYLIK",
         all_time: "GENEL",
-        pilot_label: "PİLOT: "
+        pilot_label: "PİLOT: ",
+        
+        // Level System
+        level_label: "SEVİYE {level}",
+        xp_label: "XP: {current}/{next}",
+        level_up: "SEVİYE ATLADIN!",
+        unlocked: "YENİ BİR ŞEY AÇILDI!",
+        
+        // Missions
+        missions_title: "📅 GÜNLÜK GÖREVLER",
+        missions_btn: "📅 GÖREVLER",
+        collect_reward: "ÖDÜLÜ AL",
+        mission_completed: "GÖREV TAMAMLANDI!",
+        mission_scout: "Gözcü: Dalga {goal}'e ulaş",
+        mission_hunter: "Avcı: {goal} Boss öldür",
+        mission_hoarder: "İstifçi: Bir oyunda {goal} altın topla",
+        
+        // Social
+        social_btn: "👥 SOSYAL",
+        social_title: "👥 SOSYAL MERKEZ",
+        search_pilot: "PİLOT ARA",
+        search_placeholder: "Kullanıcı adı yazın...",
+        pilot_not_found: "Pilot bulunamadı.",
+        view_profile: "PROFİLİ GÖR",
+        challenge: "DÜELLOYA DAVET ET"
     },
     en: {
         title: "SPACE WAR",
@@ -330,7 +354,31 @@ const translations = {
         name_updated: "Username updated!",
         monthly: "MONTHLY",
         all_time: "ALL TIME",
-        pilot_label: "PILOT: "
+        pilot_label: "PILOT: ",
+
+        // Level System
+        level_label: "LEVEL {level}",
+        xp_label: "XP: {current}/{next}",
+        level_up: "LEVEL UP!",
+        unlocked: "NEW UNLOCK!",
+
+        // Missions
+        missions_title: "📅 DAILY MISSIONS",
+        missions_btn: "📅 MISSIONS",
+        collect_reward: "COLLECT REWARD",
+        mission_completed: "MISSION COMPLETED!",
+        mission_scout: "Scout: Reach Wave {goal}",
+        mission_hunter: "Hunter: Kill {goal} Bosses",
+        mission_hoarder: "Hoarder: Collect {goal} gold in one run",
+
+        // Social
+        social_btn: "👥 SOCIAL",
+        social_title: "👥 SOCIAL HUB",
+        search_pilot: "SEARCH PILOT",
+        search_placeholder: "Enter username...",
+        pilot_not_found: "Pilot not found.",
+        view_profile: "VIEW PROFILE",
+        challenge: "CHALLENGE"
     },
     ru: {
         title: "КОСМИЧЕСКАЯ ВОЙНА",

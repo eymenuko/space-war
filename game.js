@@ -16,7 +16,9 @@
         settings: $('settings-screen'),
         lab: $('lab-screen'),
         achievements: $('achievements-screen'),
-        leaderboard: $('leaderboard-screen')
+        leaderboard: $('leaderboard-screen'),
+        missions: $('missions-screen'),
+        social: $('social-screen')
     };
 
     const hud = {
@@ -940,8 +942,17 @@
         language: 'tr',
         upgrades: { hp: 0, speed: 0, damage: 0, energy: 0 },
         stats: { totalKills: 0, totalBosses: 0, totalGold: 0, maxWave: 0, highScore: 0 },
-        unlockedAchievements: []
+        unlockedAchievements: [],
+        totalXP: 0,
+        lastMissionDate: null,
+        missions: []
     };
+
+    const MISSION_TYPES = [
+        { id: 'scout', key: 'mission_scout', goal: 5, reward: 200, type: 'wave' },
+        { id: 'hunter', key: 'mission_hunter', goal: 3, reward: 500, type: 'boss' },
+        { id: 'hoarder', key: 'mission_hoarder', goal: 1000, reward: 300, type: 'coins' }
+    ];
 
     const ACHIEVEMENT_LIST = [
         { id: 'rookie_pilot', icon: '🐣', get title() { return t('ach_first_kill'); }, get desc() { return t('ach_kills_desc'); }, goal: 100, stat: 'totalKills', reward: 200 },
@@ -2370,6 +2381,31 @@
         $('menu-ship-icon').textContent = ship.emoji;
         $('menu-ship-name').textContent = ship.name;
         $('menu-coins').textContent = persistentData.totalCoins;
+        updateLevelUI();
+    }
+
+    function updateLevelUI() {
+        const levelData = calculateLevel(persistentData.totalXP);
+        $('menu-level').textContent = `LVL ${levelData.level}`;
+        
+        const nextLevelXP = levelData.nextLevelXP;
+        const currentLevelXP = levelData.currentLevelXP;
+        const progress = ((persistentData.totalXP - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100;
+        
+        $('menu-xp-bar').style.width = `${progress}%`;
+        $('menu-xp-text').textContent = `${persistentData.totalXP} / ${nextLevelXP} XP`;
+    }
+
+    function calculateLevel(xp) {
+        // Simple leveling formula: Level = floor(sqrt(xp/100)) + 1
+        // Level 1: 0 XP
+        // Level 2: 100 XP
+        // Level 3: 400 XP
+        // Level 4: 900 XP
+        const level = Math.floor(Math.sqrt(xp / 100)) + 1;
+        const currentLevelXP = Math.pow(level - 1, 2) * 100;
+        const nextLevelXP = Math.pow(level, 2) * 100;
+        return { level, currentLevelXP, nextLevelXP };
     }
 
     function startGame() {
@@ -2396,6 +2432,36 @@
         
         saveData();
         saveHighScore(game.score); // Save to Firebase
+        
+        // Grant XP: Score/10 + Wave*5 + BossKills*20
+        const xpGained = Math.floor(game.score / 10) + (game.wave * 5) + (game.bossKills * 20);
+        const oldLevel = calculateLevel(persistentData.totalXP).level;
+        persistentData.totalXP += xpGained;
+        const newLevel = calculateLevel(persistentData.totalXP).level;
+        
+        if (newLevel > oldLevel) {
+            // Level Up effect could go here
+            console.log("LEVEL UP!", newLevel);
+        }
+        
+        saveData();
+        syncUserData(); // Sync XP to Firestore
+        
+        // Update missions progress
+        persistentData.missions.forEach(m => {
+            if (m.completed) return;
+            
+            if (m.type === 'wave' && game.wave >= m.goal) m.progress = m.goal;
+            else if (m.type === 'boss') m.progress += game.bossKills;
+            else if (m.type === 'coins' && game.coinsEarnedThisRun >= m.goal) m.progress = m.goal;
+            
+            if (m.progress >= m.goal) {
+                m.progress = m.goal;
+                m.completed = true;
+            }
+        });
+        saveData();
+        syncUserData();
 
         $('final-score').textContent = game.score;
         $('final-wave').textContent = game.wave;
@@ -2721,6 +2787,161 @@
         loadLeaderboard('monthly');
     });
 
+    // Missions Logic
+    function checkMissions() {
+        const today = new Date().toDateString();
+        if (persistentData.lastMissionDate !== today) {
+            generateMissions();
+            persistentData.lastMissionDate = today;
+            saveData();
+            syncUserData();
+        }
+    }
+
+    function generateMissions() {
+        // Randomly select 3 missions
+        const shuffled = [...MISSION_TYPES].sort(() => 0.5 - Math.random());
+        persistentData.missions = shuffled.slice(0, 3).map(m => ({
+            ...m,
+            progress: 0,
+            completed: false,
+            collected: false
+        }));
+    }
+
+    function updateMissionsUI() {
+        const list = $('missions-list');
+        list.innerHTML = '';
+        
+        persistentData.missions.forEach((m, index) => {
+            const item = document.createElement('div');
+            item.className = 'achievement-item'; // Reuse styling
+            
+            const desc = t(m.key).replace('{goal}', m.goal);
+            const progressPercent = (m.progress / m.goal) * 100;
+            
+            item.innerHTML = `
+                <div class="ach-icon">📅</div>
+                <div class="ach-info">
+                    <div class="ach-title">${desc}</div>
+                    <div class="ach-desc">${m.reward} 🪙</div>
+                    <div class="ach-progress-bar">
+                        <div class="ach-progress-fill" style="width: ${progressPercent}%"></div>
+                    </div>
+                </div>
+                ${m.completed && !m.collected ? 
+                    `<button class="neon-btn small collect-btn" data-index="${index}">${t('collect_reward')}</button>` : 
+                    m.collected ? `<div class="status-done">✅</div>` : 
+                    `<div class="status-value">${m.progress}/${m.goal}</div>`
+                }
+            `;
+            list.appendChild(item);
+        });
+
+        document.querySelectorAll('.collect-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idx = e.currentTarget.getAttribute('data-index');
+                collectMissionReward(idx);
+            });
+        });
+    }
+
+    function collectMissionReward(index) {
+        const mission = persistentData.missions[index];
+        if (mission.completed && !mission.collected) {
+            mission.collected = true;
+            persistentData.totalCoins += mission.reward;
+            AudioManager.playSound('buy');
+            saveData();
+            syncUserData();
+            updateMissionsUI();
+            updateMenuUI();
+        }
+    }
+
+    $('missions-btn').addEventListener('click', () => {
+        AudioManager.playSound('btn_click');
+        checkMissions();
+        updateMissionsUI();
+        showScreen('missions');
+    });
+
+    $('missions-close-btn').addEventListener('click', () => {
+        AudioManager.playSound('btn_click');
+        showScreen('start');
+    });
+
+    // Social Screen Listeners
+    $('social-btn').addEventListener('click', () => {
+        AudioManager.playSound('btn_click');
+        $('search-results').classList.add('hidden');
+        $('pilot-search-input').value = '';
+        showScreen('social');
+    });
+
+    $('social-close-btn').addEventListener('click', () => {
+        AudioManager.playSound('btn_click');
+        showScreen('start');
+    });
+
+    // Social Logic
+    $('pilot-search-btn').addEventListener('click', () => {
+        const name = $('pilot-search-input').value.trim();
+        if (!name) return;
+        
+        AudioManager.playSound('btn_click');
+        searchPilot(name);
+    });
+
+    function searchPilot(name) {
+        const results = $('search-results');
+        results.innerHTML = `<div class="loading-spinner">${t('loading')}</div>`;
+        results.classList.remove('hidden');
+        
+        db.collection('users').where('username', '==', name).limit(1).get()
+            .then(querySnapshot => {
+                if (querySnapshot.empty) {
+                    results.innerHTML = `<div style="text-align:center; padding:10px; color:#ff2d55;">${t('pilot_not_found')}</div>`;
+                    return;
+                }
+                
+                const userDoc = querySnapshot.docs[0];
+                const data = userDoc.data();
+                const levelData = calculateLevel(data.totalXP || 0);
+                
+                // Also get their high score from leaderboard
+                return db.collection('leaderboard').doc(userDoc.id).get().then(lbDoc => {
+                    const highScore = lbDoc.exists ? lbDoc.data().score : 0;
+                    
+                    results.innerHTML = `
+                        <div class="pilot-profile-card">
+                            <div class="profile-header">
+                                <div class="profile-name">${data.username}</div>
+                                <div class="level-badge">LVL ${levelData.level}</div>
+                            </div>
+                            <div class="profile-stats">
+                                <div class="profile-stat-box">
+                                    <div class="stat-box-label">${t('final_score')}</div>
+                                    <div class="stat-box-value">${highScore.toLocaleString()}</div>
+                                </div>
+                                <div class="profile-stat-box">
+                                    <div class="stat-box-label">XP</div>
+                                    <div class="stat-box-value">${data.totalXP || 0}</div>
+                                </div>
+                            </div>
+                            <button class="neon-btn small" onclick="document.getElementById('pilot-search-input').value=''; document.getElementById('search-results').classList.add('hidden');">
+                                ${t('close')}
+                            </button>
+                        </div>
+                    `;
+                });
+            })
+            .catch(err => {
+                console.error("Search error:", err);
+                results.innerHTML = `<div style="text-align:center; color:#ff2d55;">Hata oluştu.</div>`;
+            });
+    }
+
     $('leaderboard-close-btn').addEventListener('click', () => {
         AudioManager.playSound('btn_click');
         showScreen('start');
@@ -2784,12 +3005,20 @@
         db.collection('users').doc(user.uid).get().then(doc => {
             if (doc.exists) {
                 userDisplayName = doc.data().username || (user.email ? user.email.split('@')[0] : 'Pilot');
+                if (doc.data().totalXP !== undefined) {
+                    persistentData.totalXP = Math.max(persistentData.totalXP, doc.data().totalXP);
+                }
+                if (doc.data().missions !== undefined && doc.data().lastMissionDate === new Date().toDateString()) {
+                    persistentData.missions = doc.data().missions;
+                    persistentData.lastMissionDate = doc.data().lastMissionDate;
+                }
             } else {
                 userDisplayName = user.email ? user.email.split('@')[0] : 'Pilot';
                 // Create user doc if it doesn't exist
                 db.collection('users').doc(user.uid).set({
                     username: userDisplayName,
-                    email: user.email
+                    email: user.email,
+                    totalXP: persistentData.totalXP
                 });
             }
             $('menu-pilot-name').textContent = userDisplayName;
@@ -2801,6 +3030,16 @@
             $('menu-pilot-name').textContent = userDisplayName;
             updateMenuUI();
         });
+    }
+
+    function syncUserData() {
+        if (!currentUser) return;
+        db.collection('users').doc(currentUser.uid).set({
+            totalXP: persistentData.totalXP,
+            missions: persistentData.missions,
+            lastMissionDate: persistentData.lastMissionDate,
+            lastPlayed: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
     }
 
     auth.onAuthStateChanged(user => {
