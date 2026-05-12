@@ -1814,3 +1814,33 @@ body {
     text-align: right;
     font-weight: 700;
 }
+
+.menu-pilot-info {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.1rem;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+#menu-pilot-name {
+    color: #00f5ff;
+    font-weight: 700;
+}
+
+.neon-btn.small {
+    padding: 8px 15px;
+    font-size: 0.8rem;
+    min-width: 80px;
+}
+
+.neon-btn.active {
+    background: rgba(0, 245, 255, 0.2) !important;
+    box-shadow: 0 0 15px rgba(0, 245, 255, 0.4);
+    color: #fff !important;
+    border-color: #00f5ff !important;
+}
+
+.leaderboard-tabs {
+    justify-content: center;
+}

@@ -2650,14 +2650,19 @@
         }).catch(err => console.error("Error saving score:", err));
     }
 
-    function loadLeaderboard() {
+    function loadLeaderboard(category = 'all') {
         const listContainer = $('leaderboard-list');
         listContainer.innerHTML = `<div class="loading-spinner">${t('loading')}</div>`;
         
-        db.collection('leaderboard')
-            .orderBy('score', 'desc')
-            .limit(20)
-            .get()
+        let query = db.collection('leaderboard').orderBy('score', 'desc');
+        
+        if (category === 'monthly') {
+            const now = new Date();
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            query = query.where('timestamp', '>=', firebase.firestore.Timestamp.fromDate(startOfMonth));
+        }
+        
+        query.limit(20).get()
             .then((querySnapshot) => {
                 listContainer.innerHTML = '';
                 let rank = 1;
@@ -2690,8 +2695,30 @@
     // Leaderboard Listeners
     $('leaderboard-btn').addEventListener('click', () => {
         AudioManager.playSound('btn_click');
-        loadLeaderboard();
+        loadLeaderboard('all');
+        $('lb-tab-all').classList.add('active');
+        $('lb-tab-all').classList.remove('secondary');
+        $('lb-tab-monthly').classList.remove('active');
+        $('lb-tab-monthly').classList.add('secondary');
         showScreen('leaderboard');
+    });
+
+    $('lb-tab-all').addEventListener('click', () => {
+        AudioManager.playSound('btn_click');
+        $('lb-tab-all').classList.add('active');
+        $('lb-tab-all').classList.remove('secondary');
+        $('lb-tab-monthly').classList.remove('active');
+        $('lb-tab-monthly').classList.add('secondary');
+        loadLeaderboard('all');
+    });
+
+    $('lb-tab-monthly').addEventListener('click', () => {
+        AudioManager.playSound('btn_click');
+        $('lb-tab-monthly').classList.add('active');
+        $('lb-tab-monthly').classList.remove('secondary');
+        $('lb-tab-all').classList.remove('active');
+        $('lb-tab-all').classList.add('secondary');
+        loadLeaderboard('monthly');
     });
 
     $('leaderboard-close-btn').addEventListener('click', () => {
@@ -2764,12 +2791,14 @@
                     email: user.email
                 });
             }
-            $('menu-ship-name').textContent = userDisplayName;
+            $('menu-pilot-name').textContent = userDisplayName;
             $('settings-username').value = userDisplayName;
+            updateMenuUI(); // Ensure ship name is restored
         }).catch(err => {
             console.error("Error fetching user data:", err);
             userDisplayName = user.email ? user.email.split('@')[0] : 'Pilot';
-            $('menu-ship-name').textContent = userDisplayName;
+            $('menu-pilot-name').textContent = userDisplayName;
+            updateMenuUI();
         });
     }
 

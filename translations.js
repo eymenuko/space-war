@@ -163,7 +163,10 @@ const translations = {
         username: "Kullanıcı Adı",
         username_placeholder: "Kullanıcı adınızı girin",
         update_name: "İSMİ GÜNCELLE",
-        name_updated: "Kullanıcı adı güncellendi!"
+        name_updated: "Kullanıcı adı güncellendi!",
+        monthly: "AYLIK",
+        all_time: "GENEL",
+        pilot_label: "PİLOT: "
     },
     en: {
         title: "SPACE WAR",
@@ -324,7 +327,10 @@ const translations = {
         username: "Username",
         username_placeholder: "Enter your username",
         update_name: "UPDATE NAME",
-        name_updated: "Username updated!"
+        name_updated: "Username updated!",
+        monthly: "MONTHLY",
+        all_time: "ALL TIME",
+        pilot_label: "PILOT: "
     },
     ru: {
         title: "КОСМИЧЕСКАЯ ВОЙНА",

@@ -58,6 +58,9 @@
                 <span data-i18n="title">UZAY SAVAŞI</span>
             </h1>
             <p class="subtitle">Alien Boss Battle</p>
+            <div id="menu-pilot-info" class="menu-pilot-info">
+                <span data-i18n="pilot_label">PİLOT: </span><span id="menu-pilot-name">...</span>
+            </div>
             <div id="menu-ship-info" class="menu-ship-info">
                 <span id="menu-ship-icon" class="menu-ship-icon">🚀</span>
                 <span id="menu-ship-name" class="menu-ship-name">Yıldız Avcısı</span>
@@ -280,7 +283,11 @@
                 <h1 class="lab-title" data-i18n="leaderboard_title">🏆 KÜRESEL SIRALAMA</h1>
                 <button id="leaderboard-close-btn" class="neon-btn secondary small" data-i18n="back">◀ GERİ</button>
             </div>
-            <div id="leaderboard-list" class="achievements-list" style="max-height: 60vh;">
+            <div class="leaderboard-tabs" style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button id="lb-tab-all" class="neon-btn small active" data-i18n="all_time">GENEL</button>
+                <button id="lb-tab-monthly" class="neon-btn small secondary" data-i18n="monthly">AYLIK</button>
+            </div>
+            <div id="leaderboard-list" class="achievements-list" style="max-height: 55vh;">
                 <!-- Scores will be loaded here -->
                 <div class="loading-spinner" style="text-align: center; color: #00f5ff; padding: 20px;" data-i18n="loading">Yükleniyor...</div>
             </div>
