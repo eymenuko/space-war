@@ -16,8 +16,42 @@
 </head>
 
 <body>
+    <!-- Auth Screen -->
+    <div id="auth-screen" class="screen active">
+        <div class="stars-bg"></div>
+        <div class="auth-content">
+            <h1 class="game-title">
+                <span class="title-icon">🚀</span>
+                <span data-i18n="title">UZAY SAVAŞI</span>
+                <span class="title-icon">👾</span>
+            </h1>
+            <p class="subtitle">PİLOT GİRİŞİ</p>
+            
+            <div class="auth-box">
+                <form id="auth-form" autocomplete="off">
+                    <input type="email" id="auth-email" placeholder="E-posta Adresi" required class="neon-input">
+                    <input type="password" id="auth-password" placeholder="Şifre" required class="neon-input">
+                    <div id="auth-error" class="auth-error hidden"></div>
+                    
+                    <button type="submit" id="btn-login" class="neon-btn">
+                        <span>GİRİŞ YAP</span>
+                    </button>
+                    <button type="button" id="btn-register" class="neon-btn secondary">
+                        <span>KAYIT OL</span>
+                    </button>
+                </form>
+                
+                <div class="auth-divider"><span>VEYA</span></div>
+                
+                <button type="button" id="btn-google-login" class="neon-btn google">
+                    <span class="google-icon">G</span> <span>GOOGLE İLE GİRİŞ</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Start Screen -->
-    <div id="start-screen" class="screen active">
+    <div id="start-screen" class="screen">
         <div class="stars-bg"></div>
         <button id="settings-open-btn" class="settings-open-btn" title="Ayarlar">⚙️</button>
         <div class="start-content">
@@ -260,6 +294,9 @@
                 <button id="toggle-bgm-btn" class="neon-btn">
                     <span data-i18n="bgm_on">MÜZİK: AÇIK</span>
                 </button>
+                <button id="logout-btn" class="neon-btn secondary">
+                    <span data-i18n="logout">ÇIKIŞ YAP</span>
+                </button>
                 <button id="reset-progress-btn" class="neon-btn danger">
                     <span data-i18n="reset_progress">İLERLEMEYİ SIFIRLA</span>
                 </button>
@@ -271,6 +308,10 @@
             </div>
         </div>
     </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 
     <script src="translations.js"></script>
     <script src="game.js"></script>

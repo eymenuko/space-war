@@ -1600,3 +1600,130 @@ body {
         height: 60px;
     }
 }
+
+/* ===== AUTH SCREEN ===== */
+.auth-content {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    animation: fadeInUp 0.8s ease-out;
+    width: 100%;
+    max-width: 400px;
+}
+
+.auth-box {
+    background: rgba(15, 10, 40, 0.85);
+    border: 2px solid rgba(0, 245, 255, 0.4);
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    box-shadow: 0 0 30px rgba(0, 245, 255, 0.15), inset 0 0 20px rgba(123, 47, 247, 0.1);
+    backdrop-filter: blur(10px);
+    margin-top: 1rem;
+}
+
+#auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.neon-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(123, 47, 247, 0.5);
+    color: #fff;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.1rem;
+    padding: 12px 15px;
+    border-radius: 10px;
+    outline: none;
+    transition: all 0.3s;
+}
+
+.neon-input:focus {
+    border-color: #00f5ff;
+    box-shadow: 0 0 15px rgba(0, 245, 255, 0.3);
+}
+
+.neon-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.auth-error {
+    color: #ff2d55;
+    font-size: 0.9rem;
+    background: rgba(255, 45, 85, 0.1);
+    border: 1px solid rgba(255, 45, 85, 0.3);
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: -5px;
+    animation: shake 0.4s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+}
+
+#auth-form .neon-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 1.1rem;
+    margin-top: 5px;
+}
+
+.neon-btn.secondary {
+    border-color: #7b2ff7;
+    color: #7b2ff7;
+    margin-top: 0;
+}
+
+.neon-btn.secondary:hover {
+    box-shadow: 0 0 20px rgba(123, 47, 247, 0.4), inset 0 0 20px rgba(123, 47, 247, 0.1);
+    color: #fff;
+    border-color: #a465ff;
+}
+
+.auth-divider {
+    display: flex;
+    align-items: center;
+    margin: 1.5rem 0;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.9rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.auth-divider span {
+    padding: 0 10px;
+}
+
+.neon-btn.google {
+    width: 100%;
+    border-color: #ea4335;
+    color: #ea4335;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px;
+}
+
+.neon-btn.google:hover {
+    box-shadow: 0 0 20px rgba(234, 67, 53, 0.4), inset 0 0 20px rgba(234, 67, 53, 0.1);
+    color: #fff;
+    border-color: #ff6b5b;
+}
+
+.google-icon {
+    font-weight: 900;
+    font-size: 1.2rem;
+}

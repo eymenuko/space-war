@@ -8,6 +8,7 @@
     const ctx = canvas.getContext('2d');
 
     const screens = {
+        auth: $('auth-screen'),
         start: $('start-screen'),
         hangar: $('hangar-screen'),
         game: $('game-screen'),
@@ -45,7 +46,7 @@
     };
 
     // ===== CONSTANTS =====
-    const STAR_COUNT = 250;
+    const STAR_COUNT = 200;
     const MAX_ENERGY = 10;
 
     // ===== AUDIO MANAGER =====
@@ -54,8 +55,8 @@
         bgmInterval: null,
         bgmStep: 0,
         bgmNotes: [220, 220, 261.63, 293.66, 220, 220, 196, 164.81],
-
-        init: function () {
+        
+        init: function() {
             if (!this.ctx) {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 if (AudioContext) {
@@ -67,17 +68,17 @@
             }
         },
 
-        playSound: function (type) {
+        playSound: function(type) {
             if (!this.ctx || !persistentData.sfxEnabled) return;
             if (this.ctx.state === 'suspended') this.ctx.resume();
-
+            
             const osc = this.ctx.createOscillator();
             const gain = this.ctx.createGain();
             osc.connect(gain);
             gain.connect(this.ctx.destination);
             const now = this.ctx.currentTime;
-
-            switch (type) {
+            
+            switch(type) {
                 case 'star_hunter_shot':
                     osc.type = 'square';
                     osc.frequency.setValueAtTime(880, now);
@@ -225,11 +226,11 @@
             }
         },
 
-        playBGM: function () {
+        playBGM: function() {
             this.init();
             this.stopBGM();
             if (!this.ctx || !persistentData.bgmEnabled) return;
-
+            
             this.bgmInterval = setInterval(() => {
                 if (this.ctx.state === 'suspended') return;
                 const osc = this.ctx.createOscillator();
@@ -246,7 +247,7 @@
             }, 250);
         },
 
-        stopBGM: function () {
+        stopBGM: function() {
             if (this.bgmInterval) {
                 clearInterval(this.bgmInterval);
                 this.bgmInterval = null;
@@ -258,7 +259,7 @@
     function applyLanguage() {
         const lang = persistentData.language || 'tr';
         const dict = translations[lang] || translations['tr'];
-
+        
         // Update all elements with data-i18n
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
@@ -299,7 +300,7 @@
             darkColor: '#004466',
             maxHP: 100,
             speed: 6,
-            energyGain: 0.01,
+            energyGain: 0.05,
             shotCost: 1,
             superCost: 4,
             shotDamage: 12,
@@ -416,8 +417,8 @@
             darkColor: '#660011',
             maxHP: 80,
             speed: 8,
-            energyGain: 0.015,
-            shotCost: 0.9,
+            energyGain: 0.06,
+            shotCost: 0.5,
             superCost: 5,
             shotDamage: 8,
             shotSpeed: 15,
@@ -536,7 +537,7 @@
             darkColor: '#663d00',
             maxHP: 200,
             speed: 4,
-            energyGain: 0.008,
+            energyGain: 0.04,
             shotCost: 2,
             superCost: 8,
             shotDamage: 20,
@@ -544,7 +545,7 @@
             shotSize: 8,
             shotCooldown: 20,
             superCooldown: 60,
-            superDamage: 60,
+            superDamage: 50,
             get attackDesc() { return t('atk_titan'); },
             get superDesc() { return t('sup_titan'); },
             hpRating: 9,
@@ -651,7 +652,7 @@
             darkColor: '#201040',
             maxHP: 70,
             speed: 10,
-            energyGain: 0.02,
+            energyGain: 0.08,
             shotCost: 1.5,
             superCost: 6,
             shotDamage: 15,
@@ -680,8 +681,8 @@
             },
             fireSuper: function (game, p) {
                 AudioManager.playSound('ghost_blade_super');
-                // Phase shift: %30 damage reduction + auto fire (no full invincibility)
-                p.damageReduction = 300; // 5 seconds
+                // Phase shift: invincibility + auto fire
+                p.invincible = 300; // 5 seconds
                 p.autoFire = 300;
                 game.screenShake = 4;
                 game.shakeIntensity = 3;
@@ -690,7 +691,7 @@
             },
             drawShip: function (ctx, p) {
                 const thruster = Math.sin(p.thrusterPhase) * 0.3 + 0.7;
-                const ghostAlpha = p.damageReduction > 0 ? 0.5 + Math.sin(p.thrusterPhase * 5) * 0.2 : 1;
+                const ghostAlpha = p.invincible > 0 ? 0.5 + Math.sin(p.thrusterPhase * 5) * 0.2 : 1;
 
                 ctx.globalAlpha = ghostAlpha;
 
@@ -753,7 +754,7 @@
             darkColor: '#003311',
             maxHP: 150,
             speed: 5,
-            energyGain: 0.012,
+            energyGain: 0.05,
             shotCost: 3,
             superCost: 10,
             shotDamage: 30,
@@ -845,39 +846,39 @@
     const BOSS_TYPES = [
         {
             name: "Zorgax", emoji: "👾", color: "#ff2d95",
-            glowColor: "rgba(255,45,149,0.4)", baseHP: 280, speed: 3,
-            attackRate: 55, pattern: "spread", size: 60,
-            bulletColor: "#ff2d95", bulletSpeed: 5.5
+            glowColor: "rgba(255,45,149,0.4)", baseHP: 250, speed: 2,
+            attackRate: 80, pattern: "spread", size: 60,
+            bulletColor: "#ff2d95", bulletSpeed: 4
         },
         {
             name: "Krypton", emoji: "🛸", color: "#00f5ff",
-            glowColor: "rgba(0,245,255,0.4)", baseHP: 350, speed: 2.5,
-            attackRate: 40, pattern: "spiral", size: 70,
-            bulletColor: "#00f5ff", bulletSpeed: 5
+            glowColor: "rgba(0,245,255,0.4)", baseHP: 350, speed: 1.5,
+            attackRate: 60, pattern: "spiral", size: 70,
+            bulletColor: "#00f5ff", bulletSpeed: 3.5
         },
         {
             name: "Nebula", emoji: "🌀", color: "#7b2ff7",
-            glowColor: "rgba(123,47,247,0.4)", baseHP: 320, speed: 4,
-            attackRate: 35, pattern: "wave", size: 55,
-            bulletColor: "#bf7bff", bulletSpeed: 6.5
+            glowColor: "rgba(123,47,247,0.4)", baseHP: 300, speed: 3,
+            attackRate: 50, pattern: "wave", size: 55,
+            bulletColor: "#bf7bff", bulletSpeed: 5
         },
         {
             name: "Infernox", emoji: "🔥", color: "#ff6b35",
-            glowColor: "rgba(255,107,53,0.4)", baseHP: 420, speed: 1.8,
-            attackRate: 28, pattern: "burst", size: 80,
-            bulletColor: "#ff6b35", bulletSpeed: 6
+            glowColor: "rgba(255,107,53,0.4)", baseHP: 450, speed: 1,
+            attackRate: 40, pattern: "burst", size: 80,
+            bulletColor: "#ff6b35", bulletSpeed: 4.5
         },
         {
             name: "Glacius", emoji: "❄️", color: "#80dfff",
-            glowColor: "rgba(128,223,255,0.4)", baseHP: 300, speed: 3.5,
-            attackRate: 45, pattern: "rain", size: 58,
-            bulletColor: "#80dfff", bulletSpeed: 4.5
+            glowColor: "rgba(128,223,255,0.4)", baseHP: 280, speed: 2.5,
+            attackRate: 70, pattern: "rain", size: 58,
+            bulletColor: "#80dfff", bulletSpeed: 3
         },
         {
             name: "Voidclaw", emoji: "🕳️", color: "#c850c0",
-            glowColor: "rgba(200,80,192,0.4)", baseHP: 380, speed: 3,
-            attackRate: 38, pattern: "homing", size: 65,
-            bulletColor: "#c850c0", bulletSpeed: 4.5
+            glowColor: "rgba(200,80,192,0.4)", baseHP: 380, speed: 2,
+            attackRate: 55, pattern: "homing", size: 65,
+            bulletColor: "#c850c0", bulletSpeed: 3
         }
     ];
 
@@ -888,7 +889,7 @@
             get name() { return t('item_potion'); },
             emoji: '🧪',
             get description() { return t('desc_potion'); },
-            price: 250,
+            price: 50,
             effect: (game) => {
                 const p = game.player;
                 p.hp = Math.min(p.maxHP, p.hp + Math.floor(p.maxHP * 0.25));
@@ -900,7 +901,7 @@
             get name() { return t('item_crystal'); },
             emoji: '💎',
             get description() { return t('desc_crystal'); },
-            price: 350,
+            price: 75,
             effect: (game) => {
                 game.player.energy = game.player.maxEnergy;
                 showMessage(t('energy_full'), '#00f5ff');
@@ -911,7 +912,7 @@
             get name() { return t('item_shield'); },
             emoji: '🛡️',
             get description() { return t('desc_shield'); },
-            price: 600,
+            price: 200,
             effect: (game) => {
                 if (game.player.energy >= 1) {
                     game.player.energy -= 1;
@@ -1018,13 +1019,11 @@
                 speed: ship.speed + (persistentData.upgrades.speed * 0.5),
                 damageBonus: persistentData.upgrades.damage * 2,
                 invincible: 0,
-                damageReduction: 0,
                 thrusterPhase: 0,
                 hasShield: false,
                 shieldTimer: 0,
                 autoFire: 0,
                 beamMode: 0,
-                beamTickTimer: 0,
                 doubleShot: 0,
                 timeSlow: 0,
                 magnet: 0
@@ -1068,7 +1067,7 @@
     // ===== BOSS SPAWNING =====
     function spawnBoss() {
         const type = BOSS_TYPES[Math.floor(Math.random() * BOSS_TYPES.length)];
-        const hpMultiplier = 1 + (game.wave - 1) * 0.5;
+        const hpMultiplier = 1 + (game.wave - 1) * 0.3;
         const maxHP = Math.floor(type.baseHP * hpMultiplier);
 
         game.boss = {
@@ -1115,7 +1114,7 @@
         $('dialogue-emoji').textContent = emoji;
         container.classList.remove('hidden');
         container.classList.add('active');
-
+        
         // Brief pause feel
         game.paused = true;
         setTimeout(() => {
@@ -1195,7 +1194,7 @@
 
     function handleJoystickMove(e) {
         if (!joystickActive) return;
-
+        
         let touch;
         if (e.touches) {
             for (let i = 0; i < e.touches.length; i++) {
@@ -1210,15 +1209,15 @@
         }
 
         let dx = touch.clientX - joystickStartPos.x;
-
+        
         if (dx > maxJoystickDistance) dx = maxJoystickDistance;
         if (dx < -maxJoystickDistance) dx = -maxJoystickDistance;
-
+        
         const moveX = dx;
         const moveY = 0; // Sadece X ekseninde hareket etsin
-
+        
         hud.joystickKnob.style.transform = `translate(${moveX}px, ${moveY}px)`;
-
+        
         // Normalize joystick value (-1 to 1)
         touchState.joystickX = moveX / maxJoystickDistance;
         touchState.joystickY = 0;
@@ -1226,7 +1225,7 @@
 
     function handleJoystickEnd(e) {
         if (!joystickActive) return;
-
+        
         if (e && e.changedTouches) {
             let found = false;
             for (let i = 0; i < e.changedTouches.length; i++) {
@@ -1248,7 +1247,7 @@
     hud.joystickContainer.addEventListener('touchstart', e => {
         e.preventDefault();
         if (joystickActive) return;
-
+        
         joystickActive = true;
         const touch = e.changedTouches[0];
         joystickTouchId = touch.identifier;
@@ -1264,7 +1263,7 @@
     window.addEventListener('touchmove', handleJoystickMove, { passive: false });
     window.addEventListener('touchend', handleJoystickEnd);
     window.addEventListener('touchcancel', handleJoystickEnd);
-
+    
     // Mouse support for joystick (testing)
     hud.joystickContainer.addEventListener('mousedown', e => {
         if (joystickActive) return;
@@ -1322,7 +1321,7 @@
             p.energy -= ship.shotCost;
             shootCooldown = ship.shotCooldown;
             ship.fireShot(game, p);
-
+            
             // Double shot powerup
             if (p.doubleShot > 0) {
                 setTimeout(() => ship.fireShot(game, p), 100);
@@ -1337,12 +1336,12 @@
         AudioManager.playSound('boss_shoot');
 
         const pattern = b.pattern;
-        const speed = b.bulletSpeed + (game.wave - 1) * 0.4;
+        const speed = b.bulletSpeed + (game.wave - 1) * 0.2;
 
         switch (pattern) {
             case 'spread': {
-                const count = 7 + Math.floor(game.wave / 2);
-                const arc = Math.PI * 0.75;
+                const count = 5 + Math.floor(game.wave / 3);
+                const arc = Math.PI * 0.6;
                 for (let i = 0; i < count; i++) {
                     const angle = -arc / 2 + (arc / (count - 1)) * i + Math.PI / 2;
                     game.bossBullets.push(makeBossBullet(b, Math.cos(angle) * speed, Math.sin(angle) * speed));
@@ -1350,7 +1349,7 @@
                 break;
             }
             case 'spiral': {
-                const count = 4 + Math.floor(game.wave / 4);
+                const count = 3;
                 for (let i = 0; i < count; i++) {
                     const angle = game.bossSpiralAngle + (Math.PI * 2 / count) * i;
                     game.bossBullets.push(makeBossBullet(b, Math.cos(angle) * speed, Math.sin(angle) * speed));
@@ -1366,7 +1365,7 @@
                 break;
             }
             case 'burst': {
-                const count = 12 + game.wave * 2;
+                const count = 8 + game.wave;
                 for (let i = 0; i < count; i++) {
                     const angle = (Math.PI * 2 / count) * i;
                     game.bossBullets.push(makeBossBullet(b, Math.cos(angle) * speed, Math.sin(angle) * speed));
@@ -1374,7 +1373,7 @@
                 break;
             }
             case 'rain': {
-                const count = 6 + game.wave;
+                const count = 4 + Math.floor(game.wave / 2);
                 for (let i = 0; i < count; i++) {
                     const rx = b.x + (Math.random() - 0.5) * 200;
                     game.bossBullets.push({
@@ -1483,24 +1482,24 @@
     function applyPowerup(type) {
         const p = game.player;
         AudioManager.playSound('powerup');
-        switch (type) {
+        switch(type) {
             case 'double_shot':
-                p.doubleShot = 360; // 6s
+                p.doubleShot = 600; // 10s
                 showMessage(t('msg_double_shot'), '#ffcc00');
                 break;
             case 'time_slow':
-                p.timeSlow = 300; // 5s
+                p.timeSlow = 480; // 8s
                 showMessage(t('msg_time_slow'), '#00f5ff');
                 break;
             case 'magnet':
-                p.magnet = 480; // 8s
+                p.magnet = 900; // 15s
                 showMessage(t('msg_magnet'), '#ff00ff');
                 break;
             case 'nuke':
                 game.screenShake = 30;
                 game.shakeIntensity = 15;
                 if (game.boss && !game.boss.entering) {
-                    game.boss.hp -= 60;
+                    game.boss.hp -= 100;
                     spawnDamageNumber(game.boss.x, game.boss.y, 100, '#ff4400');
                 }
                 game.bossBullets = [];
@@ -1554,15 +1553,15 @@
 
     function checkPixelCollision(px, py, bx, by, bRadius) {
         if (!hitMaskData) return false;
-
+        
         const relX = Math.round(bx - px + 50);
         const relY = Math.round(by - py + 50);
         const r = Math.ceil(bRadius);
-
+        
         for (let y = relY - r; y <= relY + r; y++) {
             for (let x = relX - r; x <= relX + r; x++) {
                 if (x >= 0 && x < 100 && y >= 0 && y < 100) {
-                    if ((x - relX) * (x - relX) + (y - relY) * (y - relY) <= r * r) {
+                    if ((x - relX)*(x - relX) + (y - relY)*(y - relY) <= r*r) {
                         const alpha = hitMaskData[(y * 100 + x) * 4 + 3];
                         if (alpha > 200) {
                             return true;
@@ -1577,7 +1576,6 @@
     // ===== MERCHANT SYSTEM =====
     function openMerchant() {
         game.paused = true;
-        game.merchantBoughtItems = [];
         renderMerchantUI();
         hud.merchantOverlay.classList.remove('hidden');
     }
@@ -1636,8 +1634,7 @@
             card.className = 'head-card';
             const canAfford = game.coins >= item.price;
             const alreadyBoughtShield = item.id === 'shield_generator' && game.player.hasShield;
-            const alreadyBoughtThisVisit = game.merchantBoughtItems && game.merchantBoughtItems.includes(item.id);
-            const disabled = !canAfford || alreadyBoughtShield || alreadyBoughtThisVisit;
+            const disabled = !canAfford || alreadyBoughtShield;
 
             card.innerHTML = `
                 <div class="head-info">
@@ -1648,7 +1645,7 @@
                     </div>
                 </div>
                 <button class="buy-btn" data-id="${item.id}" ${disabled ? 'disabled' : ''}>
-                    ${alreadyBoughtShield ? t('active') : alreadyBoughtThisVisit ? '✓' : `${t('buy')} 🪙${item.price}`}
+                    ${alreadyBoughtShield ? t('active') : `${t('buy')} 🪙${item.price}`}
                 </button>
             `;
             hud.shopList.appendChild(card);
@@ -1658,11 +1655,9 @@
             btn.addEventListener('click', () => {
                 const itemId = btn.dataset.id;
                 const item = SHOP_ITEMS.find(i => i.id === itemId);
-                if (item && game.coins >= item.price && !(game.merchantBoughtItems && game.merchantBoughtItems.includes(itemId))) {
+                if (item && game.coins >= item.price) {
                     game.coins -= item.price;
                     item.effect(game);
-                    if (!game.merchantBoughtItems) game.merchantBoughtItems = [];
-                    game.merchantBoughtItems.push(itemId);
                     renderMerchantUI();
                     updateCoinDisplay();
                 }
@@ -1795,7 +1790,7 @@
         // --- Player Movement ---
         if (keys['ArrowLeft'] || keys['KeyA']) p.x -= p.speed;
         if (keys['ArrowRight'] || keys['KeyD']) p.x += p.speed;
-
+        
         // Joystick movement
         if (persistentData.touchMode && Math.abs(touchState.joystickX) > 0.1) {
             p.x += touchState.joystickX * p.speed;
@@ -1829,25 +1824,19 @@
         // --- Beam mode (Plasma Dragon ulti) ---
         if (p.beamMode > 0) {
             p.beamMode--;
-            p.beamTickTimer++;
-            // Deal 20% of boss current HP every 60 frames (1 second)
+            // Continuous beam damage
             if (b && !b.entering) {
                 const beamHitDist = Math.abs(b.x - p.x);
-                if (beamHitDist < b.size + 30) {
-                    if (p.beamTickTimer % 60 === 0) {
-                        const tickDmg = Math.floor(b.hp * 0.20);
-                        b.hp -= tickDmg;
-                        spawnDamageNumber(b.x, b.y - 20, tickDmg, '#00ff88');
-                        game.screenShake = 4;
-                        game.shakeIntensity = 3;
-                    }
+                if (beamHitDist < b.size + 10) {
+                    b.hp -= ship.superDamage;
                     if (game.particles.length < 200) {
                         spawnParticles(b.x, b.y + b.size / 2, '#00ff88', 2, 2);
                     }
+                    if (p.beamMode % 10 === 0) {
+                        spawnDamageNumber(b.x, b.y - 20, ship.superDamage * 10, '#00ff88');
+                    }
                 }
             }
-        } else {
-            p.beamTickTimer = 0;
         }
 
         // --- Powerup Timers ---
@@ -1864,7 +1853,6 @@
 
         // --- Invincibility ---
         if (p.invincible > 0) p.invincible--;
-        if (p.damageReduction > 0) p.damageReduction--;
         p.thrusterPhase += 0.15;
 
         // --- Stars ---
@@ -1924,7 +1912,7 @@
 
                 game.combo++;
                 game.comboTimer = 60;
-
+                
                 if (game.combo >= 10 && game.combo % 10 === 0) {
                     showMessage(t('serial_killer'), '#ff2d55', 2000);
                     game.player.energy = Math.min(game.player.maxEnergy, game.player.energy + 2);
@@ -1936,7 +1924,7 @@
                 }
 
                 // Random powerup drop
-                if (Math.random() < 0.06) {
+                if (Math.random() < 0.15) {
                     spawnPowerup(bullet.x, bullet.y);
                 }
 
@@ -1963,14 +1951,10 @@
                         showMessage(t('shield_broken'), '#ffffff');
                     } else {
                         AudioManager.playSound('hit');
-                        let dmg = 14 + Math.floor(game.wave * 2.5);
-                        // Ghost Blade ulti: %30 damage reduction
-                        if (p.damageReduction > 0) {
-                            dmg = Math.floor(dmg * 0.7);
-                        }
+                        const dmg = 8 + Math.floor(game.wave * 1.5);
                         p.hp -= dmg;
                         bullet.life = 0;
-                        p.invincible = 18;
+                        p.invincible = 30;
                         spawnParticles(p.x, p.y, '#ff2d55', 12, 4);
                         spawnDamageNumber(p.x, p.y - 30, dmg, '#ff2d55');
                         game.screenShake = 6;
@@ -2032,7 +2016,7 @@
         game.bossKills++;
         showMessage(`${t('msg_boss_dead')} ${b.name}! +${bonusScore}`, '#00ff88');
 
-        const headValue = Math.floor(20 + b.maxHP * 0.15 + game.wave * 8);
+        const headValue = Math.floor(50 + b.maxHP * 0.5 + game.wave * 20);
         game.bossHeads.push({
             name: b.name,
             emoji: b.emoji,
@@ -2188,60 +2172,6 @@
             ctx.fill();
             ctx.restore();
         });
-
-        // --- Plasma Dragon Beam Visual ---
-        if (game.player.beamMode > 0) {
-            const p = game.player;
-            const beamWidth = 18 + Math.sin(Date.now() * 0.02) * 6;
-            const beamX = p.x;
-            const beamTopY = 0;
-            const beamBottomY = p.y - p.height / 2;
-
-            // Outer glow
-            ctx.save();
-            const beamGrad = ctx.createLinearGradient(beamX - beamWidth * 2, 0, beamX + beamWidth * 2, 0);
-            beamGrad.addColorStop(0, 'transparent');
-            beamGrad.addColorStop(0.3, 'rgba(0,255,136,0.1)');
-            beamGrad.addColorStop(0.5, 'rgba(0,255,136,0.3)');
-            beamGrad.addColorStop(0.7, 'rgba(0,255,136,0.1)');
-            beamGrad.addColorStop(1, 'transparent');
-            ctx.fillStyle = beamGrad;
-            ctx.fillRect(beamX - beamWidth * 2, beamTopY, beamWidth * 4, beamBottomY - beamTopY);
-
-            // Core beam
-            ctx.shadowColor = '#00ff88';
-            ctx.shadowBlur = 30;
-            const coreGrad = ctx.createLinearGradient(beamX - beamWidth / 2, 0, beamX + beamWidth / 2, 0);
-            coreGrad.addColorStop(0, 'rgba(0,255,136,0.05)');
-            coreGrad.addColorStop(0.3, 'rgba(0,255,136,0.7)');
-            coreGrad.addColorStop(0.5, 'rgba(200,255,220,0.95)');
-            coreGrad.addColorStop(0.7, 'rgba(0,255,136,0.7)');
-            coreGrad.addColorStop(1, 'rgba(0,255,136,0.05)');
-            ctx.fillStyle = coreGrad;
-            ctx.fillRect(beamX - beamWidth / 2, beamTopY, beamWidth, beamBottomY - beamTopY);
-
-            // Bright center line
-            ctx.beginPath();
-            ctx.moveTo(beamX, beamTopY);
-            ctx.lineTo(beamX, beamBottomY);
-            ctx.strokeStyle = `rgba(255,255,255,${0.6 + Math.sin(Date.now() * 0.03) * 0.3})`;
-            ctx.lineWidth = 3;
-            ctx.stroke();
-
-            // Impact flash on boss
-            if (game.boss && !game.boss.entering) {
-                const bDist = Math.abs(game.boss.x - beamX);
-                if (bDist < game.boss.size + 30) {
-                    const impactGrad = ctx.createRadialGradient(beamX, game.boss.y, 0, beamX, game.boss.y, 40);
-                    impactGrad.addColorStop(0, 'rgba(200,255,220,0.8)');
-                    impactGrad.addColorStop(0.4, 'rgba(0,255,136,0.4)');
-                    impactGrad.addColorStop(1, 'transparent');
-                    ctx.fillStyle = impactGrad;
-                    ctx.fillRect(beamX - 40, game.boss.y - 40, 80, 80);
-                }
-            }
-            ctx.restore();
-        }
 
         // --- Player ---
         drawPlayer();
@@ -2679,7 +2609,111 @@
         }
     });
 
-    // Initialize menu on load
-    applyLanguage();
-    updateMenuUI();
+    // ===== FIREBASE AUTH =====
+    const firebaseConfig = {
+        apiKey: "AIzaSyApkRWO-UlTut1Iyb1a2jKqtRF4cFCdRzE",
+        authDomain: "uzay-savasi.firebaseapp.com",
+        projectId: "uzay-savasi",
+        storageBucket: "uzay-savasi.firebasestorage.app",
+        messagingSenderId: "286961410146",
+        appId: "1:286961410146:web:7616518655365b2fc5313b",
+        measurementId: "G-HZ5SG678YF"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    const authForm = $('auth-form');
+    const authEmail = $('auth-email');
+    const authPassword = $('auth-password');
+    const authError = $('auth-error');
+    const btnRegister = $('btn-register');
+    const btnGoogleLogin = $('btn-google-login');
+    const logoutBtn = $('logout-btn');
+
+    let currentUser = null;
+
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            currentUser = user;
+            // Update menu username to be email prefix
+            const username = user.email ? user.email.split('@')[0] : 'Pilot';
+            $('menu-ship-name').textContent = username;
+            
+            // Set language and update UI
+            applyLanguage();
+            updateMenuUI();
+            
+            // Show start screen instead of auth
+            goToMenu();
+        } else {
+            currentUser = null;
+            applyLanguage();
+            showScreen('auth');
+        }
+    });
+
+    authForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = authEmail.value;
+        const password = authPassword.value;
+        authError.classList.add('hidden');
+        
+        auth.signInWithEmailAndPassword(email, password)
+            .then(() => {
+                AudioManager.playSound('btn_click');
+            })
+            .catch(error => {
+                authError.textContent = error.message;
+                authError.classList.remove('hidden');
+                AudioManager.playSound('hit');
+            });
+    });
+
+    btnRegister.addEventListener('click', () => {
+        const email = authEmail.value;
+        const password = authPassword.value;
+        
+        if (!email || !password) {
+            authError.textContent = "Lütfen e-posta ve şifre girin.";
+            authError.classList.remove('hidden');
+            return;
+        }
+
+        authError.classList.add('hidden');
+        
+        auth.createUserWithEmailAndPassword(email, password)
+            .then(() => {
+                AudioManager.playSound('btn_click');
+            })
+            .catch(error => {
+                authError.textContent = error.message;
+                authError.classList.remove('hidden');
+                AudioManager.playSound('hit');
+            });
+    });
+
+    btnGoogleLogin.addEventListener('click', () => {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        authError.classList.add('hidden');
+        
+        auth.signInWithPopup(provider)
+            .then(() => {
+                AudioManager.playSound('btn_click');
+            })
+            .catch(error => {
+                authError.textContent = error.message;
+                authError.classList.remove('hidden');
+                AudioManager.playSound('hit');
+            });
+    });
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            AudioManager.playSound('btn_click');
+            auth.signOut();
+            showScreen('auth');
+        });
+    }
+
 })();
