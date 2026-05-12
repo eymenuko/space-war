@@ -2701,7 +2701,10 @@
 
     // Username Update Logic
     $('update-username-btn').addEventListener('click', () => {
-        if (!currentUser) return;
+        if (!currentUser) {
+            console.error("No user logged in");
+            return;
+        }
         
         const newName = $('settings-username').value.trim();
         if (!newName) return;
@@ -2711,23 +2714,29 @@
         status.textContent = "Güncelleniyor...";
         status.classList.remove('hidden');
         
+        console.log("Updating username to:", newName);
+        
         // Update users collection
-        db.collection('users').doc(currentUser.uid).update({
+        db.collection('users').doc(currentUser.uid).set({
             username: newName
-        }).then(() => {
+        }, { merge: true }).then(() => {
             userDisplayName = newName;
             $('menu-ship-name').textContent = newName;
             
+            console.log("User doc updated");
+            
             // Also update leaderboard entry if exists
-            return db.collection('leaderboard').doc(currentUser.uid).update({
+            return db.collection('leaderboard').doc(currentUser.uid).set({
                 name: newName
-            }).catch(() => {}); // Ignore if no leaderboard entry yet
+            }, { merge: true });
         }).then(() => {
+            console.log("Leaderboard updated");
             status.textContent = t('name_updated');
             setTimeout(() => status.classList.add('hidden'), 3000);
         }).catch(err => {
             console.error("Update error:", err);
-            status.textContent = "Hata oluştu.";
+            status.textContent = "Hata: " + (err.code || "Bağlantı hatası");
+            setTimeout(() => status.classList.add('hidden'), 5000);
         });
     });
 
