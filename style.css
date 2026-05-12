@@ -1819,8 +1819,9 @@ body {
     font-family: 'Rajdhani', sans-serif;
     font-size: 1.1rem;
     color: #fff;
-    margin-bottom: 0.5rem;
+    margin: 0 auto 0.5rem auto;
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    text-align: center;
 }
 
 #menu-pilot-name {
@@ -1850,7 +1851,7 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 1.2rem;
+    margin: 0 auto 1.2rem auto;
     width: 100%;
     max-width: 300px;
 }
