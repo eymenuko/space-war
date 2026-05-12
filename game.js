@@ -2748,7 +2748,8 @@
             username: newName
         }, { merge: true }).then(() => {
             userDisplayName = newName;
-            $('menu-ship-name').textContent = newName;
+            $('menu-pilot-name').textContent = newName;
+            updateMenuUI(); // Ensure ship name is restored
             
             console.log("User doc updated");
             
