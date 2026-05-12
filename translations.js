@@ -182,6 +182,8 @@ const translations = {
         mission_scout: "Gözcü: Dalga {goal}'e ulaş",
         mission_hunter: "Avcı: {goal} Boss öldür",
         mission_hoarder: "İstifçi: Bir oyunda {goal} altın topla",
+        xp_gained: "Kazanılan XP",
+        level_up_toast: "TEBRİKLER! SEVİYE {level} OLDUN!",
         
         // Social
         social_btn: "👥 SOSYAL",
@@ -370,6 +372,8 @@ const translations = {
         mission_scout: "Scout: Reach Wave {goal}",
         mission_hunter: "Hunter: Kill {goal} Bosses",
         mission_hoarder: "Hoarder: Collect {goal} gold in one run",
+        xp_gained: "XP Gained",
+        level_up_toast: "CONGRATS! YOU ARE LEVEL {level}!",
 
         // Social
         social_btn: "👥 SOCIAL",

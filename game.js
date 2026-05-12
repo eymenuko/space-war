@@ -2396,6 +2396,26 @@
         $('menu-xp-text').textContent = `${persistentData.totalXP} / ${nextLevelXP} XP`;
     }
 
+    function showLevelUpNotification(level) {
+        const toast = document.createElement('div');
+        toast.className = 'achievement-toast';
+        toast.style.borderColor = '#00f5ff';
+        toast.innerHTML = `
+            <div class="ach-toast-icon">⭐</div>
+            <div class="ach-toast-info">
+                <div class="ach-toast-title">${t('level_up')}</div>
+                <div class="ach-toast-desc">${t('level_up_toast').replace('{level}', level)}</div>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        AudioManager.playSound('achievement');
+        setTimeout(() => toast.classList.add('show'), 100);
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 500);
+        }, 5000);
+    }
+
     function calculateLevel(xp) {
         // Simple leveling formula: Level = floor(sqrt(xp/100)) + 1
         // Level 1: 0 XP
@@ -2430,22 +2450,11 @@
             persistentData.stats.highScore = game.score;
         }
         
-        saveData();
-        saveHighScore(game.score); // Save to Firebase
-        
         // Grant XP: Score/10 + Wave*5 + BossKills*20
         const xpGained = Math.floor(game.score / 10) + (game.wave * 5) + (game.bossKills * 20);
         const oldLevel = calculateLevel(persistentData.totalXP).level;
         persistentData.totalXP += xpGained;
         const newLevel = calculateLevel(persistentData.totalXP).level;
-        
-        if (newLevel > oldLevel) {
-            // Level Up effect could go here
-            console.log("LEVEL UP!", newLevel);
-        }
-        
-        saveData();
-        syncUserData(); // Sync XP to Firestore
         
         // Update missions progress
         persistentData.missions.forEach(m => {
@@ -2460,15 +2469,20 @@
                 m.completed = true;
             }
         });
+        
         saveData();
-        syncUserData();
+        
+        if (newLevel > oldLevel) {
+            showLevelUpNotification(newLevel);
+        }
 
         $('final-score').textContent = game.score;
         $('final-wave').textContent = game.wave;
         $('final-kills').textContent = game.bossKills;
         $('final-coins-earned').textContent = game.coinsEarnedThisRun;
+        $('final-xp-earned').textContent = xpGained;
 
-        setTimeout(() => showScreen('over'), 500);
+        showScreen('gameover');
     }
 
     function goToMenu() {
@@ -3008,17 +3022,33 @@
                 if (doc.data().totalXP !== undefined) {
                     persistentData.totalXP = Math.max(persistentData.totalXP, doc.data().totalXP);
                 }
+                if (doc.data().totalCoins !== undefined) {
+                    persistentData.totalCoins = Math.max(persistentData.totalCoins, doc.data().totalCoins);
+                }
+                if (doc.data().unlockedShips) {
+                    persistentData.unlockedShips = Array.from(new Set([...persistentData.unlockedShips, ...doc.data().unlockedShips]));
+                }
+                if (doc.data().upgrades) {
+                    persistentData.upgrades.hp = Math.max(persistentData.upgrades.hp, doc.data().upgrades.hp || 0);
+                    persistentData.upgrades.speed = Math.max(persistentData.upgrades.speed, doc.data().upgrades.speed || 0);
+                    persistentData.upgrades.damage = Math.max(persistentData.upgrades.damage, doc.data().upgrades.damage || 0);
+                    persistentData.upgrades.energy = Math.max(persistentData.upgrades.energy, doc.data().upgrades.energy || 0);
+                }
                 if (doc.data().missions !== undefined && doc.data().lastMissionDate === new Date().toDateString()) {
                     persistentData.missions = doc.data().missions;
                     persistentData.lastMissionDate = doc.data().lastMissionDate;
                 }
+                saveData(); // Save merged data to local
             } else {
                 userDisplayName = user.email ? user.email.split('@')[0] : 'Pilot';
                 // Create user doc if it doesn't exist
                 db.collection('users').doc(user.uid).set({
                     username: userDisplayName,
                     email: user.email,
-                    totalXP: persistentData.totalXP
+                    totalXP: persistentData.totalXP,
+                    totalCoins: persistentData.totalCoins,
+                    unlockedShips: persistentData.unlockedShips,
+                    upgrades: persistentData.upgrades
                 });
             }
             $('menu-pilot-name').textContent = userDisplayName;
@@ -3036,6 +3066,9 @@
         if (!currentUser) return;
         db.collection('users').doc(currentUser.uid).set({
             totalXP: persistentData.totalXP,
+            totalCoins: persistentData.totalCoins,
+            unlockedShips: persistentData.unlockedShips,
+            upgrades: persistentData.upgrades,
             missions: persistentData.missions,
             lastMissionDate: persistentData.lastMissionDate,
             lastPlayed: firebase.firestore.FieldValue.serverTimestamp()
