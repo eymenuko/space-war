@@ -2396,25 +2396,124 @@
         $('menu-xp-text').textContent = `${persistentData.totalXP} / ${nextLevelXP} XP`;
     }
 
-    function showLevelUpNotification(level) {
-        const toast = document.createElement('div');
-        toast.className = 'achievement-toast';
-        toast.style.borderColor = '#00f5ff';
-        toast.innerHTML = `
-            <div class="ach-toast-icon">⭐</div>
-            <div class="ach-toast-info">
-                <div class="ach-toast-title">${t('level_up')}</div>
-                <div class="ach-toast-desc">${t('level_up_toast').replace('{level}', level)}</div>
-            </div>
-        `;
-        document.body.appendChild(toast);
-        AudioManager.playSound('achievement');
-        setTimeout(() => toast.classList.add('show'), 100);
-        setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 500);
-        }, 5000);
+    // Level-up perk definitions per level milestone
+    const LEVEL_PERKS = {
+        5:  [{ icon: '💥', text: '+5% Hasar' }, { icon: '⭐', text: 'Yeni Sınır' }],
+        10: [{ icon: '❤️', text: '+10 Maks Can' }, { icon: '🚀', text: '+0.5 Hız' }],
+        15: [{ icon: '⚡', text: '+1 Maks Enerji' }, { icon: '💎', text: 'Kristal Aura' }],
+        20: [{ icon: '🔥', text: '+10% Hasar' }, { icon: '🛡️', text: 'Kalkan Güçlendi' }],
+        25: [{ icon: '🌟', text: '+15% XP Kazanım' }, { icon: '🎯', text: 'Hassas Atış' }],
+        30: [{ icon: '👑', text: 'EFSANE UNVAN' }, { icon: '✨', text: '+20% Tüm Stat' }],
+    };
+
+    function spawnLevelUpParticles() {
+        const container = document.getElementById('levelup-stars');
+        if (!container) return;
+        container.innerHTML = '';
+        const colors = ['#00f5ff', '#7b2ff7', '#ff2d95', '#ffd700', '#00ff88'];
+        for (let i = 0; i < 60; i++) {
+            const star = document.createElement('div');
+            star.className = 'lv-star';
+            const size = Math.random() * 6 + 2;
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const left = Math.random() * 100;
+            const delay = Math.random() * 2;
+            const duration = Math.random() * 3 + 2;
+            const startY = 100 + Math.random() * 20;
+            star.style.cssText = `
+                width:${size}px; height:${size}px;
+                background:${color};
+                box-shadow: 0 0 ${size * 2}px ${color};
+                left:${left}%;
+                top:${startY}%;
+                animation-duration:${duration}s;
+                animation-delay:${delay}s;
+            `;
+            container.appendChild(star);
+        }
     }
+
+    let _levelUpCallback = null;
+
+    function showLevelUpNotification(level, xpGained, callback) {
+        const overlay = document.getElementById('levelup-overlay');
+        if (!overlay) { if (callback) callback(); return; }
+
+        // Populate data
+        document.getElementById('levelup-number').textContent = level;
+        document.getElementById('levelup-xp-gained').textContent = `+${xpGained} XP`;
+
+        // XP bar
+        const levelData = calculateLevel(persistentData.totalXP);
+        const prevLevelXP = Math.pow(level - 1, 2) * 100;
+        const nextLevelXP = Math.pow(level, 2) * 100;
+        const progress = Math.min(100,
+            ((persistentData.totalXP - prevLevelXP) / (nextLevelXP - prevLevelXP)) * 100
+        );
+        document.getElementById('levelup-xp-text').textContent =
+            `${persistentData.totalXP} / ${nextLevelXP} XP`;
+        const fillEl = document.getElementById('levelup-xp-fill');
+        fillEl.style.width = '0%';
+
+        // Perks
+        const perksEl = document.getElementById('levelup-perks');
+        perksEl.innerHTML = '';
+        const milestone = Object.keys(LEVEL_PERKS)
+            .map(Number)
+            .filter(k => level >= k)
+            .sort((a,b) => b - a)[0];
+        const perks = milestone ? LEVEL_PERKS[milestone] : [];
+        perks.forEach((p, i) => {
+            const el = document.createElement('div');
+            el.className = 'levelup-perk';
+            el.style.animationDelay = `${0.9 + i * 0.15}s`;
+            el.innerHTML = `<span>${p.icon}</span><span>${p.text}</span>`;
+            perksEl.appendChild(el);
+        });
+
+        // i18n title
+        const titleEl = overlay.querySelector('.levelup-title-text');
+        titleEl.textContent = t('level_up') || 'SEVİYE ATLADI!';
+        const labelEl = overlay.querySelector('.levelup-label');
+        labelEl.textContent = 'SEVİYE';
+
+        // Spawn particles
+        spawnLevelUpParticles();
+
+        // Show overlay
+        overlay.classList.remove('hidden');
+        requestAnimationFrame(() => {
+            overlay.classList.add('active');
+        });
+
+        // Animate XP bar after a short delay
+        setTimeout(() => {
+            fillEl.style.width = progress + '%';
+        }, 700);
+
+        // Play sound
+        AudioManager.playSound('btn_click');
+
+        // Store callback
+        _levelUpCallback = callback;
+    }
+
+    // Continue button handler
+    document.getElementById('levelup-continue-btn')?.addEventListener('click', () => {
+        const overlay = document.getElementById('levelup-overlay');
+        if (!overlay) return;
+        AudioManager.playSound('btn_click');
+        overlay.classList.remove('active');
+        setTimeout(() => {
+            overlay.classList.add('hidden');
+            document.getElementById('levelup-stars').innerHTML = '';
+            if (_levelUpCallback) {
+                _levelUpCallback();
+                _levelUpCallback = null;
+            }
+        }, 400);
+    });
+
 
     function calculateLevel(xp) {
         // Simple leveling formula: Level = floor(sqrt(xp/100)) + 1
@@ -2473,16 +2572,23 @@
         saveData();
         
         if (newLevel > oldLevel) {
-            showLevelUpNotification(newLevel);
+            showLevelUpNotification(newLevel, xpGained, () => {
+                $('final-score').textContent = game.score;
+                $('final-wave').textContent = game.wave;
+                $('final-kills').textContent = game.bossKills;
+                $('final-coins-earned').textContent = game.coinsEarnedThisRun;
+                $('final-xp-earned').textContent = xpGained;
+                showScreen('gameover');
+            });
+        } else {
+            $('final-score').textContent = game.score;
+            $('final-wave').textContent = game.wave;
+            $('final-kills').textContent = game.bossKills;
+            $('final-coins-earned').textContent = game.coinsEarnedThisRun;
+            $('final-xp-earned').textContent = xpGained;
+            showScreen('gameover');
         }
 
-        $('final-score').textContent = game.score;
-        $('final-wave').textContent = game.wave;
-        $('final-kills').textContent = game.bossKills;
-        $('final-coins-earned').textContent = game.coinsEarnedThisRun;
-        $('final-xp-earned').textContent = xpGained;
-
-        showScreen('gameover');
     }
 
     function goToMenu() {

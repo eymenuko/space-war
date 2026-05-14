@@ -262,6 +262,43 @@
         </div>
     </div>
 
+    <!-- Level Up Overlay -->
+    <div id="levelup-overlay" class="levelup-overlay hidden">
+        <div class="levelup-bg-burst"></div>
+        <div class="levelup-stars" id="levelup-stars"></div>
+        <div class="levelup-panel">
+            <div class="levelup-badge-ring">
+                <div class="levelup-badge-outer">
+                    <div class="levelup-badge-inner">
+                        <span class="levelup-star-icon">⭐</span>
+                    </div>
+                </div>
+            </div>
+            <div class="levelup-title-row">
+                <span class="levelup-title-text">SEVİYE ATLADI!</span>
+            </div>
+            <div class="levelup-number-row">
+                <span class="levelup-label">SEVİYE</span>
+                <span class="levelup-number" id="levelup-number">2</span>
+            </div>
+            <div class="levelup-divider"></div>
+            <div class="levelup-xp-section">
+                <div class="levelup-xp-label">Kazanılan XP</div>
+                <div class="levelup-xp-gained" id="levelup-xp-gained">+150 XP</div>
+                <div class="levelup-xp-bar-wrap">
+                    <div class="levelup-xp-bar-bg">
+                        <div class="levelup-xp-bar-fill" id="levelup-xp-fill"></div>
+                    </div>
+                    <div class="levelup-xp-bar-text" id="levelup-xp-text">0 / 100 XP</div>
+                </div>
+            </div>
+            <div class="levelup-perks" id="levelup-perks"></div>
+            <button class="neon-btn levelup-continue-btn" id="levelup-continue-btn">
+                <span>DEVAM ET ▶</span>
+            </button>
+        </div>
+    </div>
+
     <!-- Game Over Screen -->
     <div id="gameover-screen" class="screen">
         <div class="stars-bg"></div>
