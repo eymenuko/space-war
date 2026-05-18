@@ -37,6 +37,7 @@ const translations = {
         instruction_shoot: "Enerji Saldırısı",
         instruction_super: "Süper Saldırı",
         language: "DİL",
+        anon_login: "MİSAFİR GİRİŞİ",
 
         // Dynamic Texts
         boss_incoming: "⚠️ {name} GELİYOR!",
@@ -231,6 +232,7 @@ const translations = {
         instruction_shoot: "Energy Attack",
         instruction_super: "Super Attack",
         language: "LANGUAGE",
+        anon_login: "GUEST LOGIN",
 
         boss_incoming: "⚠️ {name} INCOMING!",
         shield_active: "🛡️ SHIELD ACTIVE!",
@@ -421,6 +423,7 @@ const translations = {
         instruction_shoot: "Энерго-атака",
         instruction_super: "Супер-атака",
         language: "ЯЗЫК",
+        anon_login: "ГОСТЕВОЙ ВХОД",
 
         boss_incoming: "⚠️ ПРИБЛИЖАЕТСЯ {name}!",
         shield_active: "🛡️ ЩИТ АКТИВЕН!",
@@ -568,6 +571,7 @@ const translations = {
         instruction_shoot: "هجوم الطاقة",
         instruction_super: "الهجوم الخارق",
         language: "اللغة",
+        anon_login: "دخول كضيف",
 
         boss_incoming: "⚠️ {name} قادم!",
         shield_active: "🛡️ الدرع نشط!",
@@ -715,6 +719,7 @@ const translations = {
         instruction_shoot: "Επίθεση Ενέργειας",
         instruction_super: "Σούπερ Επίθεση",
         language: "ΓΛΩΣΣΑ",
+        anon_login: "ΣΥΝΔΕΣΗ ΕΠΙΣΚΕΠΤΗ",
 
         boss_incoming: "⚠️ Ο/Η {name} ΕΡΧΕΤΑΙ!",
         shield_active: "🛡️ ΑΣΠΙΔΑ ΕΝΕΡΓΗ!",

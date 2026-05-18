@@ -3115,6 +3115,7 @@
     const authError = $('auth-error');
     const btnRegister = $('btn-register');
     const btnGoogleLogin = $('btn-google-login');
+    const btnAnonLogin = $('btn-anon-login');
     const logoutBtn = $('logout-btn');
     const authUsername = $('auth-username');
 
@@ -3262,6 +3263,22 @@
                 AudioManager.playSound('hit');
             });
     });
+
+    if (btnAnonLogin) {
+        btnAnonLogin.addEventListener('click', () => {
+            authError.classList.add('hidden');
+            
+            auth.signInAnonymously()
+                .then(() => {
+                    AudioManager.playSound('btn_click');
+                })
+                .catch(error => {
+                    authError.textContent = error.message;
+                    authError.classList.remove('hidden');
+                    AudioManager.playSound('hit');
+                });
+        });
+    }
 
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
